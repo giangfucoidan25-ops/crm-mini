@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CRM Mini - Ứng dụng quản lý khách hàng cá nhân cho sales thực phẩm chức năng. Local-first, AI-assisted.">
+    <title>CRM Mini — Quản Lý Khách Hàng</title>
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <!-- Dexie.js - IndexedDB Wrapper -->
+    <script src="https://unpkg.com/dexie@3.2.7/dist/dexie.min.js"></script>
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="style.css?v=2.0">
+</head>
+<body>
+    <!-- ===== LOADING SCREEN ===== -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                    <rect width="48" height="48" rx="12" fill="url(#logo-gradient)"/>
+                    <path d="M14 24C14 18.477 18.477 14 24 14C29.523 14 34 18.477 34 24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M18 24C18 20.686 20.686 18 24 18C27.314 18 30 20.686 30 24C30 27.314 27.314 30 24 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="24" cy="24" r="3" fill="white"/>
+                    <defs>
+                        <linearGradient id="logo-gradient" x1="0" y1="0" x2="48" y2="48">
+                            <stop stop-color="#6C63FF"/>
+                            <stop offset="1" stop-color="#3B82F6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h2 class="loading-title">CRM Mini</h2>
+            <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+            <p id="loading-text" class="loading-text">Đang khởi tạo hệ thống...</p>
+        </div>
+    </div>
+
+    <!-- ===== APP CONTAINER ===== -->
+    <div id="app" class="app-container" style="display:none;">
+        <!-- ===== SIDEBAR ===== -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                        <rect width="48" height="48" rx="12" fill="url(#sidebar-logo-grad)"/>
+                        <path d="M14 24C14 18.477 18.477 14 24 14C29.523 14 34 18.477 34 24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M18 24C18 20.686 20.686 18 24 18C27.314 18 30 20.686 30 24C30 27.314 27.314 30 24 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="24" cy="24" r="3" fill="white"/>
+                        <defs><linearGradient id="sidebar-logo-grad" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#6C63FF"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs>
+                    </svg>
+                    <div class="sidebar-brand">
+                        <h1>CRM Mini</h1>
+                        <span class="sidebar-version">v1.0</span>
+                    </div>
+                </div>
+                <button id="btn-toggle-sidebar" class="btn-toggle-sidebar" title="Thu gọn sidebar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="#dashboard" class="nav-link active" data-page="dashboard" id="nav-dashboard">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            <span>Dashboard</span>
+                            <span class="nav-badge badge-alert" id="badge-dashboard" style="display:none;">0</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#customers" class="nav-link" data-page="customers" id="nav-customers">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Khách hàng</span>
+                            <span class="nav-badge" id="badge-customers" style="display:none;">0</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#orders" class="nav-link" data-page="orders" id="nav-orders">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                            <span>Đơn hàng</span>
+                            <span class="nav-badge" id="badge-orders" style="display:none;">0</span>
+                        </a>
+                    </li>
+
+
+                    <li class="nav-divider"><span>Chăm sóc</span></li>
+
+                    <li>
+                        <a href="#care" class="nav-link" data-page="care" id="nav-care">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <span>Chăm sóc KH</span>
+                            <span class="nav-badge badge-alert" id="badge-care" style="display:none;">0</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#remedies" class="nav-link" data-page="remedies" id="nav-remedies">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <span>Bài thuốc hay</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#transferred" class="nav-link" data-page="transferred" id="nav-transferred">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><path d="M8 21H3v-5"/><path d="M3 21l7-7"/></svg>
+                            <span>KH bị chuyển</span>
+                            <span class="nav-badge" id="badge-transferred" style="display:none;">0</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#stopped" class="nav-link" data-page="stopped" id="nav-stopped">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                            <span>KH tạm dừng</span>
+                            <span class="nav-badge" id="badge-stopped" style="display:none;">0</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#cancelled" class="nav-link" data-page="cancelled" id="nav-cancelled">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>
+                            <span>KH Hủy/hoàn</span>
+                            <span class="nav-badge" id="badge-cancelled" style="display:none;">0</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#zalo" class="nav-link" data-page="zalo" id="nav-zalo">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <span>Zalo & Tin nhắn</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-divider"><span>Phân tích</span></li>
+
+                    <li>
+                        <a href="#revenue" class="nav-link" data-page="revenue" id="nav-revenue">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <span>Doanh số & HH</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#charts" class="nav-link" data-page="charts" id="nav-charts">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                            <span>Biểu đồ</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#ai-history" class="nav-link" data-page="ai-history" id="nav-ai-history">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><path d="M9 22V12h6v10"/></svg>
+                            <span>Lịch sử Cố vấn</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#ai-analysis" class="nav-link" data-page="ai-analysis" id="nav-ai-analysis">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M12 2a4 4 0 0 0-4 4c0 1.95 1.4 3.58 3.25 3.93"/><path d="M4.5 12.5C3 13.5 2 15.2 2 17c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5 0-1.8-1-3.5-2.5-4.5"/></svg>
+                            <span>Phân tích AI</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-divider"><span>Hệ thống</span></li>
+
+                    <li>
+                        <a href="#backup" class="nav-link" data-page="backup" id="nav-backup">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Backup & Restore</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#settings" class="nav-link" data-page="settings" id="nav-settings">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            <span>Cài đặt</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#products" class="nav-link" data-page="products" id="nav-products">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                            <span>Cài đặt sản phẩm</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#promotions" class="nav-link" data-page="promotions" id="nav-promotions">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
+                            <span>Chương trình ưu đãi</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="btn-theme-toggle" class="btn-theme-toggle" title="Chuyển đổi giao diện">
+                    <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <span id="theme-text">Chế độ sáng</span>
+                </button>
+                <div class="sidebar-info">
+                    <small>Local-first • AI-assisted</small>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main id="main-content" class="main-content">
+            <!-- Header Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <button id="btn-mobile-menu" class="btn-mobile-menu">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <h2 id="page-title" class="page-title">Dashboard</h2>
+                </div>
+                <div class="top-bar-right">
+                    <div id="topbar-sync-status" style="margin-right: 15px; display: flex; align-items: center;">
+                        <span title="Chưa kết nối Google Drive" style="color:var(--text-muted); font-size:1.2rem; cursor:pointer;" onclick="App.navigateTo('settings')">☁️</span>
+                    </div>
+                    <div class="search-box" id="global-search-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="global-search" placeholder="Tìm kiếm khách hàng, sản phẩm..." autocomplete="off">
+                    </div>
+                    <button id="btn-quick-add" class="btn-primary btn-sm" title="Thêm nhanh">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span>Thêm mới</span>
+                    </button>
+                    <button id="btn-backup-quick" class="btn-icon" title="Backup nhanh">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Page Container -->
+            <div id="page-container" class="page-container">
+
+                <!-- ===== DASHBOARD PAGE ===== -->
+                <section id="page-dashboard" class="page active">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Tổng quan hoạt động</h3>
+                            <p class="page-subtitle" id="dashboard-date"></p>
+                        </div>
+                        <div class="page-header-right">
+                            <div class="filter-group">
+                                <select id="dashboard-time-filter" class="select-filter">
+                                    <option value="today">Hôm nay</option>
+                                    <option value="7days">7 ngày qua</option>
+                                    <option value="month" selected>Tháng này</option>
+                                    <option value="last_month">Tháng trước</option>
+                                    <option value="quarter">Quý này</option>
+                                    <option value="last_quarter">Quý trước</option>
+                                    <option value="year">Năm nay</option>
+                                    <option value="last_year">Năm trước</option>
+                                    <option value="custom">Tùy chọn...</option>
+                                </select>
+                                <div id="dashboard-custom-date" class="custom-date-range" style="display:none;">
+                                    <input type="date" id="dashboard-date-from" class="input-date">
+                                    <span>→</span>
+                                    <input type="date" id="dashboard-date-to" class="input-date">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doanh số & Hoa hồng KPI Cards -->
+                    <div class="revenue-kpi-grid" id="dashboard-revenue-kpis" style="margin-bottom: var(--space-6);">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- Today's Tasks -->
+                    <div class="dashboard-bottom-grid" style="margin-bottom: var(--space-6);">
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h4>🔔 Khách cần gọi hôm nay</h4>
+                                <span class="badge badge-alert" id="count-today-calls">0</span>
+                            </div>
+                            <div class="card-body" id="today-calls-list">
+                                <p class="empty-state">Không có khách cần gọi hôm nay</p>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h4>⭐ Khách cần chăm sóc đặc biệt</h4>
+                                <span class="badge badge-warning" id="count-special-care">0</span>
+                            </div>
+                            <div class="card-body" id="special-care-list">
+                                <p class="empty-state">Chưa có khách cần chăm sóc đặc biệt</p>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h4>🏆 Top sản phẩm bán chạy</h4>
+                            </div>
+                            <div class="card-body" id="top-products-list">
+                                <p class="empty-state">Chưa có dữ liệu sản phẩm</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Cards Grid -->
+                    <div class="dashboard-kpi-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px;">
+                        <div class="glass-card" style="padding: 20px;">
+                            <h4 style="margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light); color: var(--color-blue); display: flex; align-items: center; gap: 8px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                BOX KHÁCH HÀNG
+                            </h4>
+                            <div class="kpi-grid" id="kpi-grid-customers" style="grid-template-columns: 1fr; gap: 12px;"></div>
+                        </div>
+                        <div class="glass-card" style="padding: 20px;">
+                            <h4 style="margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light); color: var(--color-orange); display: flex; align-items: center; gap: 8px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                BOX CHĂM SÓC
+                            </h4>
+                            <div class="kpi-grid" id="kpi-grid-care" style="grid-template-columns: 1fr; gap: 12px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Charts -->
+                    <div class="dashboard-charts-grid">
+                        <div class="chart-card glass-card">
+                            <div class="chart-header">
+                                <h4>Trạng thái đơn hàng</h4>
+                            </div>
+                            <div class="chart-body">
+                                <canvas id="chart-order-status"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card glass-card">
+                            <div class="chart-header">
+                                <h4>Doanh số theo thời gian</h4>
+                            </div>
+                            <div class="chart-body">
+                                <canvas id="chart-revenue-time"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card glass-card">
+                            <div class="chart-header">
+                                <h4>Doanh số theo sản phẩm</h4>
+                            </div>
+                            <div class="chart-body">
+                                <canvas id="chart-revenue-product"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card glass-card">
+                            <div class="chart-header">
+                                <h4>Khách sắp hết / đã hết sản phẩm</h4>
+                            </div>
+                            <div class="chart-body">
+                                <canvas id="chart-product-expiry"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ===== CUSTOMERS PAGE ===== -->
+                <section id="page-customers" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Quản lý khách hàng</h3>
+                            <p class="page-subtitle">Danh sách và quản lý thông tin khách hàng</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn-primary" id="btn-add-customer">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Thêm khách hàng
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Filters -->
+                    <div class="filter-bar glass-card">
+                        <div class="filter-row">
+                            <div class="search-box filter-search">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="customer-search" placeholder="Tìm tên, SĐT, Zalo..." autocomplete="off">
+                            </div>
+                            <select id="customer-filter-status" class="select-filter">
+                                <option value="all">Tất cả trạng thái</option>
+                                <option value="consulting">Đang tư vấn</option>
+                                <option value="waiting_close">Chờ chốt</option>
+                                <option value="purchased">Đã mua hàng</option>
+                                <option value="repurchased">Khách cũ/Quay lại</option>
+                                <option value="vip">VIP</option>
+                                <option value="agency">Đại lý</option>
+                                <option value="stopped">Tạm dừng (Rác)</option>
+                                <option value="transferred">Bị chuyển</option>
+                            </select>
+                            <select id="customer-filter-product" class="select-filter">
+                                <option value="all">Tất cả sản phẩm</option>
+                            </select>
+                            <select id="customer-filter-source" class="select-filter">
+                                <option value="">Tất cả nguồn</option>
+                                <option value="facebook">Facebook cá nhân</option>
+                                <option value="fanpage">Fanpage</option>
+                                <option value="zalo">Zalo</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="website">Website</option>
+                                <option value="livestream">Livestream</option>
+                                <option value="referral">Khách cũ giới thiệu</option>
+                                <option value="event">Hội thảo/sự kiện</option>
+                                <option value="company_data">Data công ty</option>
+                                <option value="acquaintance">Người quen</option>
+                                <option value="other">Khác</option>
+                            </select>
+                            <select id="customer-filter-time" class="select-filter">
+                                <option value="all">Tất cả thời gian</option>
+                                <option value="this_month">Tháng này</option>
+                                <option value="last_month">Tháng trước</option>
+                                <option value="3_months">3 tháng trước</option>
+                                <option value="6_months">6 tháng trước</option>
+                                <option value="1_year">1 năm trước</option>
+                                <option value="custom">Tùy chọn...</option>
+                            </select>
+                            <div id="customer-custom-date" class="custom-date-range" style="display:none;">
+                                <input type="date" id="customer-date-from" class="input-date">
+                                <span>→</span>
+                                <input type="date" id="customer-date-to" class="input-date">
+                            </div>
+                            <select id="customer-filter-care" class="select-filter">
+                                <option value="">Tình trạng chăm sóc</option>
+                                <option value="due_today">Đến hạn hôm nay</option>
+                                <option value="overdue">Quá hạn</option>
+                                <option value="overdue_30">Quá hạn >30 ngày</option>
+                                <option value="product_running_out">Sắp hết SP</option>
+                                <option value="product_out">Đã hết SP</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Table -->
+                    <div class="table-container glass-card">
+                        <table class="data-table" id="customers-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">STT</th>
+                                    <th class="sortable" data-sort="full_name">Tên khách hàng</th>
+                                    <th class="sortable" data-sort="phone">Điện thoại</th>
+                                    <th class="sortable" data-sort="status">Trạng thái</th>
+                                    <th class="sortable" data-sort="total_revenue">Doanh số</th>
+                                    <th class="sortable" data-sort="last_contact_date">Chăm sóc gần nhất</th>
+                                    <th>Tình trạng SP</th>
+                                    <th style="min-width: 270px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-tbody"></tbody>
+                        </table>
+                        <div class="pagination" id="customers-pagination"></div>
+                    </div>
+                </section>
+
+                <!-- ===== PRODUCTS PAGE ===== -->
+                <section id="page-products" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Quản lý sản phẩm</h3>
+                            <p class="page-subtitle">Thực phẩm chức năng & chu kỳ sử dụng</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn-primary" id="btn-add-product">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Thêm sản phẩm
+                            </button>
+                        </div>
+                    </div>
+                    <div class="filter-bar glass-card">
+                        <div class="filter-row">
+                            <div class="search-box filter-search">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="product-search" placeholder="Tìm sản phẩm..." autocomplete="off">
+                            </div>
+                            <select id="product-sort" class="select-filter">
+                                <option value="">Sắp xếp</option>
+                                <option value="price_asc">Giá thấp → cao</option>
+                                <option value="price_desc">Giá cao → thấp</option>
+                                <option value="revenue_desc">Doanh số cao → thấp</option>
+                                <option value="sold_desc">Số lượng bán cao → thấp</option>
+                                <option value="cycle_asc">Chu kỳ ngắn → dài</option>
+                                <option value="expiry_desc">Nhiều khách sắp hết</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="products-grid" id="products-grid">
+                        <!-- Products cards rendered by JS -->
+                    </div>
+                    <div class="pagination" id="products-pagination"></div>
+                </section>
+
+                <!-- ===== ORDERS PAGE ===== -->
+                <section id="page-orders" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Quản lý đơn hàng</h3>
+                            <p class="page-subtitle">Tạo và theo dõi đơn hàng</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn-primary" id="btn-add-order">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Tạo đơn hàng
+                            </button>
+                        </div>
+                    </div>
+                    <div class="filter-bar glass-card">
+                        <div class="filter-row">
+                            <select id="order-filter-status" class="select-filter">
+                                <option value="all">Tất cả trạng thái</option>
+                                <option value="pending">Chờ xử lý</option>
+                                <option value="awaiting_payment">Chờ thanh toán</option>
+                                <option value="shipping">Đang giao hàng</option>
+                                <option value="completed">Đã hoàn thành</option>
+                                <option value="cancelled">Đã hủy</option>
+                                <option value="returned">Hoàn hàng</option>
+                            </select>
+                            <select id="order-filter-product" class="select-filter">
+                                <option value="all">Tất cả sản phẩm</option>
+                            </select>
+                            <div class="search-box filter-search">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="order-search" placeholder="Tìm đơn hàng, khách hàng..." autocomplete="off">
+                            </div>
+                            <select id="order-filter-time" class="select-filter">
+                                <option value="">Tất cả thời gian</option>
+                                <option value="today">Hôm nay</option>
+                                <option value="7days">7 ngày qua</option>
+                                <option value="month">Tháng này</option>
+                                <option value="last_month">Tháng trước</option>
+                                <option value="quarter">Quý này</option>
+                                <option value="last_quarter">Quý trước</option>
+                                <option value="year">Năm nay</option>
+                                <option value="last_year">Năm trước</option>
+                                <option value="custom">Tùy chọn...</option>
+                            </select>
+                            <div id="order-custom-date" class="custom-date-range" style="display:none; margin-left:10px;">
+                                <input type="date" id="order-date-from" class="input-date">
+                                <span>→</span>
+                                <input type="date" id="order-date-to" class="input-date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container glass-card">
+                        <table class="data-table" id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-sort="order_date">Ngày đặt</th>
+                                    <th>Khách hàng</th>
+                                    <th>Sản phẩm</th>
+                                    <th class="sortable" data-sort="quantity">SL</th>
+                                    <th class="sortable" data-sort="total_amount">Tổng tiền</th>
+                                    <th class="sortable" data-sort="order_status">Trạng thái</th>
+                                    <th>Ngày hết SP dự kiến</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-tbody"></tbody>
+                        </table>
+                        <div class="pagination" id="orders-pagination"></div>
+                    </div>
+                </section>
+
+                <!-- ===== CARE PAGE ===== -->
+                <section id="page-care" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Chăm sóc khách hàng</h3>
+                            <p class="page-subtitle">Theo dõi chu kỳ chăm sóc 30 ngày & sản phẩm</p>
+                        </div>
+                        <div class="page-header-right" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end;">
+                            <div class="search-box filter-search" style="min-width: 200px; max-width: 300px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="care-search" placeholder="Tìm tên, SĐT..." autocomplete="off">
+                            </div>
+                            <select id="care-filter-product" class="select-filter" style="min-width: 140px;">
+                                <option value="all">Tất cả sản phẩm</option>
+                                <option value="Nutri Nano Fucoidan">Nutri Nano Fucoidan</option>
+                                <option value="Fucoidan Nano">Fucoidan Nano</option>
+                                <option value="Ancan">Ancan</option>
+                                <option value="Fu 8">Fu 8</option>
+                            </select>
+                            <select id="care-scan-time" class="select-filter" style="min-width: 140px;">
+                                <option value="all">Tất cả thời gian</option>
+                                <option value="this_month">Tháng này</option>
+                                <option value="last_month">Tháng trước</option>
+                                <option value="3_months">3 tháng trước</option>
+                                <option value="6_months">6 tháng trước</option>
+                                <option value="1_year">1 năm trước</option>
+                                <option value="custom">Tùy chọn...</option>
+                            </select>
+                            <div id="care-scan-custom-date" class="custom-date-range" style="display:none;">
+                                <input type="date" id="care-scan-date-from" class="input-date">
+                                <span>→</span>
+                                <input type="date" id="care-scan-date-to" class="input-date">
+                            </div>
+                            <label class="toggle-label" title="Bật/Tắt AI phân tích ngữ cảnh" style="margin-right: 8px;">
+                                <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">AI</span>
+                                <input type="checkbox" id="care-use-ai" class="toggle-input">
+                                <div class="toggle-switch"></div>
+                            </label>
+                            <button class="btn-primary" id="btn-scan-care">
+                                🔄 Quét dữ liệu
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Care Search and Tabs -->
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: var(--space-4); flex-wrap: wrap;">
+                        <div class="tabs glass-card" style="flex: 1; margin-bottom: 0; display: flex; flex-wrap: wrap;">
+                            <button class="tab-btn active" data-tab="care-due">🔔 Đến hạn CS <span class="tab-badge" id="tab-badge-due">0</span></button>
+                            <button class="tab-btn" data-tab="care-overdue">⚠️ Quá hạn <span class="tab-badge" id="tab-badge-overdue">0</span></button>
+                            <button class="tab-btn" data-tab="care-product-out">📦 Sắp/Đã hết SP <span class="tab-badge" id="tab-badge-product">0</span></button>
+                            <button class="tab-btn" data-tab="care-special">⭐ Ưu tiên đặc biệt <span class="tab-badge" id="tab-badge-special">0</span></button>
+                            <button class="tab-btn" data-tab="care-appointment">📅 Lịch hẹn KH <span class="tab-badge" id="tab-badge-appointment">0</span></button>
+                            <button class="tab-btn" data-tab="care-history">📋 Lịch sử CS</button>
+                        </div>
+                    </div>
+                    <div id="care-tab-content" class="tab-content">
+                        <!-- Rendered by JS -->
+                    </div>
+                    <div class="pagination" id="care-pagination"></div>
+                </section>
+
+                <!-- ===== TRANSFERRED PAGE ===== -->
+                <section id="page-transferred" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Khách hàng bị chuyển</h3>
+                            <p class="page-subtitle">Danh sách khách đã bị chuyển cho sale khác</p>
+                        </div>
+                        <div class="page-header-right" style="display: flex; gap: 10px;">
+                            <select id="transferred-filter-product" class="select-filter">
+                                <option value="all">Tất cả sản phẩm</option>
+                                <option value="Nutri Nano Fucoidan">Nutri Nano Fucoidan</option>
+                                <option value="Fucoidan Nano">Fucoidan Nano</option>
+                                <option value="Ancan">Ancan</option>
+                                <option value="Fu 8">Fu 8</option>
+                            </select>
+                            <div class="search-box filter-search">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="transferred-search" placeholder="Tìm kiếm tên, SĐT..." autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container glass-card">
+                        <table class="data-table" id="transferred-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">STT</th>
+                                    <th>Tên khách hàng</th>
+                                    <th>Điện thoại</th>
+                                    <th>Ngày chuyển</th>
+                                    <th>Lý do</th>
+                                    <th>Tổng doanh số cũ</th>
+                                    <th>Tổng đơn hàng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transferred-tbody"></tbody>
+                        </table>
+                        <div class="pagination" id="transferred-pagination"></div>
+                    </div>
+                </section>
+
+                <!-- ===== REMEDIES PAGE ===== -->
+                <section id="page-remedies" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Bài thuốc hay</h3>
+                            <p class="page-subtitle">Tuyển tập các phương pháp, bài thuốc hiệu quả từ khách hàng</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn-primary" onclick="RemediesModule.scanAiRemedies()" id="btn-scan-remedies">
+                                🤖 AI Quét Tìm Bài Thuốc
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="remedies-select-all-container" style="display:none; padding: 16px 16px 0 16px;">
+                        <label style="display:flex; align-items:center; gap: 12px; font-size: 14px; font-weight: 500; cursor:pointer; color: var(--text-primary);">
+                            <input type="checkbox" id="remedies-select-all" onchange="RemediesModule.toggleSelectAll()" style="transform:scale(1.3); cursor:pointer;"> Chọn tất cả
+                        </label>
+                    </div>
+
+                    <div id="remedies-delete-bar" style="display:none; justify-content:space-between; align-items:center; background:var(--bg-tertiary); padding:12px; border-radius:8px; margin-top:12px; border:1px solid var(--border-color);">
+                        <span style="font-size:14px; font-weight:600; color:var(--text-primary);"><span id="remedies-selected-count">0</span> mục đã chọn</span>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-secondary" onclick="RemediesModule.clearSelection()" style="font-size:13px; padding:6px 12px;">Hủy</button>
+                            <button class="btn-primary" onclick="RemediesModule.deleteSelected()" style="font-size:13px; padding:6px 12px; background:var(--color-danger); border:none;">Xóa các mục đã chọn</button>
+                        </div>
+                    </div>
+
+                    <div class="remedies-list" id="remedies-list" style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
+                        <!-- List of remedies will be injected here -->
+                    </div>
+                    <div class="pagination" id="remedies-pagination" style="margin-top: 20px; text-align: center;"></div>
+                </section>
+
+                <!-- ===== STOPPED PAGE ===== -->
+                <section id="page-stopped" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Khách hàng Tạm dừng</h3>
+                            <p class="page-subtitle">Danh sách khách hàng đã ngừng sử dụng sản phẩm</p>
+                        </div>
+                        <div class="page-header-right" style="display: flex; gap: 10px;">
+                            <select id="stopped-filter-product" class="select-filter">
+                                <option value="all">Tất cả sản phẩm</option>
+                                <option value="Nutri Nano Fucoidan">Nutri Nano Fucoidan</option>
+                                <option value="Fucoidan Nano">Fucoidan Nano</option>
+                                <option value="Ancan">Ancan</option>
+                                <option value="Fu 8">Fu 8</option>
+                            </select>
+                            <div class="search-box filter-search">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="stopped-search" placeholder="Tìm kiếm tên, SĐT..." autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container glass-card">
+                        <table class="data-table" id="stopped-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">STT</th>
+                                    <th>Tên khách hàng</th>
+                                    <th>Điện thoại</th>
+                                    <th>Ghi chú</th>
+                                    <th>Tổng doanh số</th>
+                                    <th style="width: 100px; text-align: center;">Xác nhận</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stopped-tbody"></tbody>
+                        </table>
+                        <div class="pagination" id="stopped-pagination"></div>
+                    </div>
+                </section>
+
+                <!-- ===== CANCELLED PAGE ===== -->
+                <section id="page-cancelled" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Khách hàng Hủy/Hoàn</h3>
+                            <p class="page-subtitle">Danh sách khách hàng đã hủy hoặc hoàn đơn</p>
+                        </div>
+                        <div class="page-header-right" style="display: flex; gap: 10px;">
+                            <select id="cancelled-filter-product" class="select-filter">
+                                <option value="all">Tất cả sản phẩm</option>
+                                <option value="Nutri Nano Fucoidan">Nutri Nano Fucoidan</option>
+                                <option value="Fucoidan Nano">Fucoidan Nano</option>
+                                <option value="Ancan">Ancan</option>
+                                <option value="Fu 8">Fu 8</option>
+                            </select>
+                            <div class="search-box filter-search">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="cancelled-search" placeholder="Tìm kiếm tên, SĐT..." autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container glass-card">
+                        <table class="data-table" id="cancelled-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">STT</th>
+                                    <th>Tên khách hàng</th>
+                                    <th>Điện thoại</th>
+                                    <th>Ghi chú</th>
+                                    <th>Tổng doanh số</th>
+                                    <th style="width: 100px; text-align: center;">Xác nhận</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cancelled-tbody"></tbody>
+                        </table>
+                        <div class="pagination" id="cancelled-pagination"></div>
+                    </div>
+                </section>
+
+                <!-- ===== ZALO PAGE ===== -->
+                <section id="page-zalo" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Zalo & Mẫu tin nhắn</h3>
+                            <p class="page-subtitle">Quản lý mẫu tin nhắn và gửi Zalo thủ công</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn-primary" id="btn-add-template">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Thêm mẫu tin
+                            </button>
+                        </div>
+                    </div>
+                    <div class="zalo-layout">
+                        <div class="glass-card zalo-templates" id="zalo-templates-panel">
+                            <h4>📝 Mẫu tin nhắn</h4>
+                            <div id="templates-list"></div>
+                        </div>
+                        <div class="glass-card zalo-compose">
+                            <h4>✉️ Soạn tin nhắn</h4>
+                            <div class="compose-form">
+                                <div class="form-group">
+                                    <label>Chọn khách hàng</label>
+                                    <select id="zalo-customer-select" class="select-filter">
+                                        <option value="">-- Chọn khách hàng --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Chọn mẫu tin</label>
+                                    <select id="zalo-template-select" class="select-filter">
+                                        <option value="">-- Chọn mẫu --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nội dung tin nhắn</label>
+                                    <textarea id="zalo-message-content" rows="6" placeholder="Nội dung tin nhắn sẽ hiển thị ở đây..."></textarea>
+                                </div>
+                                <div class="compose-actions">
+                                    <button class="btn-secondary" id="btn-copy-message">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                        Copy tin nhắn
+                                    </button>
+                                    <button class="btn-primary" id="btn-open-zalo">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                        Mở Zalo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== REVENUE PAGE ===== -->
+                <section id="page-revenue" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Doanh số & Hoa hồng</h3>
+                            <p class="page-subtitle">Theo dõi doanh thu và thu nhập cá nhân</p>
+                        </div>
+                        <div class="page-header-right">
+                            <select id="revenue-time-filter" class="select-filter">
+                                <option value="today">Hôm nay</option>
+                                <option value="7days">7 ngày qua</option>
+                                <option value="month" selected>Tháng này</option>
+                                <option value="last_month">Tháng trước</option>
+                                <option value="quarter">Quý này</option>
+                                <option value="last_quarter">Quý trước</option>
+                                <option value="year">Năm nay</option>
+                                <option value="last_year">Năm trước</option>
+                                <option value="custom">Tùy chọn...</option>
+                            </select>
+                            <div id="revenue-custom-date" class="custom-date-range" style="display:none; margin-left:10px;">
+                                <input type="date" id="revenue-date-from" class="input-date">
+                                <span>→</span>
+                                <input type="date" id="revenue-date-to" class="input-date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="revenue-kpi-grid" id="revenue-kpi-grid">
+                        <!-- Revenue KPIs rendered by JS -->
+                    </div>
+                    <div class="dashboard-charts-grid">
+                        <div class="chart-card glass-card">
+                            <div class="chart-header"><h4>Doanh số theo thời gian</h4></div>
+                            <div class="chart-body"><canvas id="chart-revenue-detail"></canvas></div>
+                        </div>
+                        <div class="chart-card glass-card">
+                            <div class="chart-header"><h4>Doanh số theo nguồn khách</h4></div>
+                            <div class="chart-body"><canvas id="chart-revenue-source"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="margin-top: 1.5rem;">
+                        <div class="card-header"><h4>📊 Tỉ lệ chuyển đổi cá nhân</h4></div>
+                        <div class="card-body" id="conversion-stats"></div>
+                    </div>
+                </section>
+
+                <!-- ===== CHARTS PAGE ===== -->
+                <section id="page-charts" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Biểu đồ phân tích</h3>
+                            <p class="page-subtitle">Click vào biểu đồ để xem danh sách chi tiết</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button id="btn-covan-ai" class="btn-covan-ai" title="Cố vấn AI phân tích chiến lược">
+                                <span class="btn-covan-ai-sparkle">✨</span>
+                                <span class="btn-covan-ai-text">Cố vấn AI</span>
+                            </button>
+                            <select id="charts-time-filter" class="select-filter">
+                                <option value="month" selected>Tháng này</option>
+                                <option value="last_month">Tháng trước</option>
+                                <option value="quarter">Quý này</option>
+                                <option value="last_quarter">Quý trước</option>
+                                <option value="year">Năm nay</option>
+                                <option value="last_year">Năm trước</option>
+                                <option value="custom">Tùy chọn...</option>
+                            </select>
+                            <div id="charts-custom-date" class="custom-date-range" style="display:none; margin-left:10px;">
+                                <input type="date" id="charts-date-from" class="input-date">
+                                <span>→</span>
+                                <input type="date" id="charts-date-to" class="input-date">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- KPI Cards for Key Metrics -->
+                    <div style="margin-bottom: var(--space-3); margin-top: var(--space-2);">
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                            🎯 Nhóm chỉ số đánh giá hiệu quả (Kết quả - KPIs)
+                        </h4>
+                    </div>
+                    <div class="kpi-grid" id="charts-kpi-grid" style="margin-bottom: var(--space-6);">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- Retention by Cycle Table -->
+                    <div class="glass-card" style="margin-bottom: var(--space-6); padding: var(--space-4);">
+                        <div class="card-header" style="margin-bottom: var(--space-3);">
+                            <h4 style="font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text-primary); text-transform: uppercase;">
+                                🔄 Tỷ lệ KH theo liệu trình (Retention by Cycle)
+                            </h4>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.5;">TPCN là sản phẩm có tính chu kỳ. Bảng này giúp đo lường sức khỏe lòng trung thành qua từng giai đoạn mua hàng.</p>
+                        </div>
+                        <div class="table-container" style="margin: 0; padding: 0; overflow-x: auto;">
+                            <table class="data-table" style="min-width: 100% !important; border-collapse: collapse; border-spacing: 0;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 10px 16px; border-bottom: 2px solid var(--border-color); font-weight: 700; text-transform: uppercase; font-size: 11px; color: var(--text-muted); background: var(--bg-tertiary);">Chu kỳ chuyển đổi</th>
+                                        <th style="padding: 10px 16px; border-bottom: 2px solid var(--border-color); font-weight: 700; text-transform: uppercase; font-size: 11px; color: var(--text-muted); background: var(--bg-tertiary);">Số KH đã mua lần N</th>
+                                        <th style="padding: 10px 16px; border-bottom: 2px solid var(--border-color); font-weight: 700; text-transform: uppercase; font-size: 11px; color: var(--text-muted); background: var(--bg-tertiary);">Số KH mua tiếp lần N+1</th>
+                                        <th style="padding: 10px 16px; border-bottom: 2px solid var(--border-color); font-weight: 700; text-transform: uppercase; font-size: 11px; color: var(--text-muted); background: var(--bg-tertiary);">Tỷ lệ chuyển đổi</th>
+                                        <th style="padding: 10px 16px; border-bottom: 2px solid var(--border-color); font-weight: 700; text-transform: uppercase; font-size: 11px; color: var(--text-muted); background: var(--bg-tertiary);">Đánh giá</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="charts-cycle-tbody">
+                                    <!-- Rendered dynamically by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- KPI Cards for Leading Indicators -->
+                    <div style="margin-bottom: var(--space-3); margin-top: var(--space-5);">
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                            ⚡ Chỉ số cải thiện hiệu quả (Leading Indicators)
+                        </h4>
+                    </div>
+                    <div class="kpi-grid" id="charts-leading-kpi-grid" style="margin-bottom: var(--space-6);">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <div class="charts-full-grid">
+                        <div class="chart-card glass-card"><div class="chart-header"><h4>Trạng thái đơn hàng</h4></div><div class="chart-body chart-body-lg"><canvas id="chart-full-order-status"></canvas></div></div>
+                        <div class="chart-card glass-card"><div class="chart-header"><h4>Doanh số theo sản phẩm</h4></div><div class="chart-body chart-body-lg"><canvas id="chart-full-revenue-product"></canvas></div></div>
+                        <div class="chart-card glass-card"><div class="chart-header"><h4>Số lượng bán theo sản phẩm</h4></div><div class="chart-body chart-body-lg"><canvas id="chart-full-quantity-product"></canvas></div></div>
+                        <div class="chart-card glass-card"><div class="chart-header"><h4>Doanh số theo thời gian</h4></div><div class="chart-body chart-body-lg"><canvas id="chart-full-revenue-time"></canvas></div></div>
+                        <div class="chart-card glass-card"><div class="chart-header"><h4>Khách sắp hết / đã hết sản phẩm</h4></div><div class="chart-body chart-body-lg"><canvas id="chart-full-product-expiry"></canvas></div></div>
+                        <div class="chart-card glass-card"><div class="chart-header"><h4>Khách quá hạn chăm sóc</h4></div><div class="chart-body chart-body-lg"><canvas id="chart-full-overdue-care"></canvas></div></div>
+                        <div class="chart-card glass-card"><div class="chart-header"><h4>Doanh số theo nguồn khách</h4></div><div class="chart-body chart-body-lg"><canvas id="chart-full-revenue-source"></canvas></div></div>
+                        <div class="chart-card glass-card"><div class="chart-header"><h4>Phễu chuyển đổi cá nhân</h4></div><div class="chart-body chart-body-lg"><canvas id="chart-full-funnel"></canvas></div></div>
+                    </div>
+                </section>
+
+                <!-- ===== AI ANALYSIS PAGE ===== -->
+                <section id="page-ai-analysis" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Phân tích AI / Antigravity</h3>
+                            <p class="page-subtitle">Xuất dữ liệu & tạo prompt cho AI hỗ trợ phân tích</p>
+                        </div>
+                    </div>
+                    <div class="ai-layout">
+                        <div class="glass-card ai-config">
+                            <h4>⚙️ Cấu hình phân tích</h4>
+                            <div class="form-group">
+                                <label>Loại phân tích</label>
+                                <select id="ai-analysis-type" class="select-filter">
+                                    <option value="care_today">Khách cần chăm sóc hôm nay</option>
+                                    <option value="repurchase">Khách có khả năng mua lại</option>
+                                    <option value="overdue">Khách quá hạn chăm sóc</option>
+                                    <option value="revenue_source">Doanh số theo nguồn khách</option>
+                                    <option value="revenue_product">Doanh số theo sản phẩm</option>
+                                    <option value="performance">Hiệu suất cá nhân</option>
+                                    <option value="transferred">Khách bị chuyển</option>
+                                    <option value="order_status">Trạng thái đơn hàng</option>
+                                    <option value="opportunity">Cơ hội doanh thu từ khách sắp hết SP</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Khoảng thời gian</label>
+                                <select id="ai-time-range" class="select-filter">
+                                    <option value="7days">7 ngày qua</option>
+                                    <option value="month" selected>Tháng này</option>
+                                    <option value="last_month">Tháng trước</option>
+                                    <option value="quarter">Quý này</option>
+                                    <option value="last_quarter">Quý trước</option>
+                                    <option value="year">Năm nay</option>
+                                    <option value="last_year">Năm trước</option>
+                                    <option value="all">Tất cả</option>
+                                    <option value="custom">Tùy chọn...</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="ai-custom-date" style="display:none;">
+                                <div style="display:flex; align-items:center; gap: 5px;">
+                                    <input type="date" id="ai-date-from" class="input-date" style="flex:1;">
+                                    <span>→</span>
+                                    <input type="date" id="ai-date-to" class="input-date" style="flex:1;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="ai-hide-sensitive" class="toggle-input">
+                                    <span class="toggle-switch"></span>
+                                    Ẩn thông tin nhạy cảm
+                                </label>
+                            </div>
+                            <div class="ai-actions">
+                                <button class="btn-secondary" id="btn-ai-export-json">📄 Xuất JSON</button>
+                                <button class="btn-secondary" id="btn-ai-export-csv">📊 Xuất CSV</button>
+                                <button class="btn-primary" id="btn-ai-generate-prompt">🤖 Tạo Prompt AI</button>
+                            </div>
+                        </div>
+                        <div class="glass-card ai-prompt-area">
+                            <h4>📋 Prompt phân tích</h4>
+                            <textarea id="ai-prompt-output" rows="15" readonly placeholder="Prompt sẽ hiển thị ở đây sau khi nhấn 'Tạo Prompt AI'..."></textarea>
+                            <div class="ai-prompt-actions">
+                                <button class="btn-primary" id="btn-ai-copy-prompt">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    Copy Prompt
+                                </button>
+                                <button class="btn-secondary" id="btn-ai-save-note">💾 Lưu vào ghi chú</button>
+                                <button class="btn-primary" id="btn-ai-analyze-now" style="background: var(--gradient-primary);">✨ Phân tích ngay</button>
+                            </div>
+                        </div>
+
+                        <div class="glass-card ai-result-area" id="ai-result-area" style="display: none; margin-top: 20px; grid-column: 1 / -1;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4>💡 Kết quả phân tích AI</h4>
+                                <button class="btn-secondary" id="btn-ai-copy-result">Copy Kết quả</button>
+                            </div>
+                            <div id="ai-result-content" class="markdown-body" style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-top: 10px; min-height: 100px;"></div>
+                            
+                            <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                                <h4>🕰️ Lịch sử phân tích</h4>
+                                <div id="ai-history-list" style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+                                    <!-- Lịch sử sẽ được render vào đây -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== BACKUP PAGE ===== -->
+                <section id="page-backup" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Backup & Khôi phục dữ liệu</h3>
+                            <p class="page-subtitle">Bảo vệ dữ liệu của bạn</p>
+                        </div>
+                    </div>
+                    <div class="backup-layout">
+                        <div class="glass-card backup-card">
+                            <div class="backup-icon backup-icon-export">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            </div>
+                            <h4>Backup dữ liệu</h4>
+                            <p>Tải toàn bộ dữ liệu về máy tính dưới dạng file JSON</p>
+                            <button class="btn-primary btn-lg" id="btn-backup-data">🔒 Backup ngay</button>
+                        </div>
+                        <div class="glass-card backup-card">
+                            <div class="backup-icon backup-icon-import">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            </div>
+                            <h4>Khôi phục dữ liệu</h4>
+                            <p>Nhập dữ liệu từ file backup JSON đã lưu trước đó</p>
+                            <button class="btn-warning btn-lg" id="btn-restore-data">📥 Khôi phục</button>
+                            <input type="file" id="restore-file-input" accept=".json" style="display:none;">
+                        </div>
+                        <div class="glass-card backup-card">
+                            <div class="backup-icon backup-icon-csv">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </div>
+                            <h4>Xuất Excel/CSV</h4>
+                            <p>Xuất dữ liệu riêng cho khách hàng, đơn hàng hoặc doanh số</p>
+                            <select id="export-type" class="select-filter" style="margin-bottom: 0.75rem;">
+                                <option value="customers">Khách hàng</option>
+                                <option value="orders">Đơn hàng</option>
+                                <option value="revenue">Doanh số</option>
+                            </select>
+                            <button class="btn-secondary btn-lg" id="btn-export-csv">📊 Xuất CSV</button>
+                        </div>
+                        <div class="glass-card backup-card" style="grid-column: 1 / -1; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                            <div class="backup-icon" style="background:var(--bg-card); color:var(--color-purple);">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M12 2a4 4 0 0 0-4 4c0 1.95 1.4 3.58 3.25 3.93"/><path d="M4.5 12.5C3 13.5 2 15.2 2 17c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5 0-1.8-1-3.5-2.5-4.5"/></svg>
+                            </div>
+                            <h4>Trích xuất AI (Nhập liệu)</h4>
+                            <p style="max-width:400px; margin:0 auto 1rem auto;">Tự động đọc dữ liệu từ file ảnh (chụp sổ/card visit), PDF, Excel hoặc Word để tạo khách hàng mới.</p>
+                            <div style="display:flex; gap:10px; align-items:center; width:100%; justify-content:center;">
+                                <input type="file" id="ai-import-file-input" accept=".pdf, image/*, .docx, .xlsx" style="display:none;">
+                                <button class="btn-primary btn-lg" id="btn-ai-import-file" style="background:var(--color-purple);">🪄 Chọn File Tải Lên</button>
+                            </div>
+                            <div id="ai-retry-container" style="display:none; margin-top: 10px; align-items:center; justify-content:center; gap: 10px;">
+                                <span id="ai-last-filename" style="font-size: 13px; color: var(--text-color); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
+                                <button class="btn-secondary btn-sm" id="btn-ai-retry-file" style="padding: 5px 10px; font-size: 12px;">🔄 Thử lại file cũ</button>
+                            </div>
+                            <div id="ai-import-progress" style="display:none; margin-top:1rem; width:100%; max-width:400px;">
+                                <p style="font-size:13px; color:var(--color-purple); margin-bottom:4px;" id="ai-import-status">Đang xử lý...</p>
+                                <div style="width:100%; height:6px; background:var(--border-color); border-radius:3px; overflow:hidden;">
+                                    <div id="ai-import-bar" style="width:50%; height:100%; background:var(--color-purple); animation: pulse 1.5s infinite;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="margin-top: 1.5rem;">
+                        <div class="card-header"><h4>📋 Lịch sử Backup</h4></div>
+                        <div class="card-body" id="backup-history-list">
+                            <p class="empty-state">Chưa có lịch sử backup</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== CUSTOMER DETAIL PAGE ===== -->
+                <section id="page-customer-detail" class="page">
+                </section>
+
+                <!-- ===== AI HISTORY PAGE ===== -->
+                <section id="page-ai-history" class="page">
+                    <!-- VIEW: DANH SÁCH -->
+                    <div id="ai-history-list-view">
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h3>Lịch sử Cố vấn AI</h3>
+                                <p class="page-subtitle">Xem lại các phân tích và theo dõi tiến độ công việc</p>
+                            </div>
+                        </div>
+                        <div class="ai-history-list" id="ai-history-list">
+                            <div class="covan-loading-sm" style="padding:20px;text-align:center;">Đang tải dữ liệu...</div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW: CHI TIẾT (Full page) -->
+                    <div id="ai-history-detail-view" style="display: none;">
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <button class="btn btn-secondary" onclick="AiHistoryModule.goBack()" style="margin-right: 15px; padding: 6px 12px; display: flex; align-items: center; gap: 5px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                    Quay lại
+                                </button>
+                                <h3>Chi tiết phiên Cố vấn</h3>
+                                <p class="page-subtitle" id="ai-history-detail-time"></p>
+                            </div>
+                        </div>
+                        <div class="ai-history-detail-content" id="ai-history-detail">
+                            <!-- Nội dung render bằng JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== SETTINGS PAGE ===== -->
+                <section id="page-settings" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Cài đặt hệ thống</h3>
+                            <p class="page-subtitle">Tùy chỉnh ứng dụng CRM Mini</p>
+                        </div>
+                    </div>
+                    <div class="settings-grid">
+                        <div class="glass-card settings-card">
+                            <h4>🔑 Kết nối AI</h4>
+                            <div class="form-group">
+                                <label>Gemini API Key</label>
+                                <input type="password" id="setting-gemini-key" class="input-field" placeholder="Nhập API Key tại đây...">
+                                <span style="font-size:11px; color:var(--text-muted); display:block; margin-top:4px;">Lấy miễn phí tại <a href="https://aistudio.google.com/" target="_blank" style="color:var(--color-primary);">Google AI Studio</a>. Dùng để AI tự động trích xuất file.</span>
+                            </div>
+                            <button class="btn-primary btn-sm" id="btn-save-gemini-key">Lưu Key</button>
+                            
+                            <hr style="margin: 15px 0; border: 0; border-top: 1px solid var(--border-color);">
+                            
+                            <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <label style="margin-bottom: 0;">🤖 Bật AI phân tích Ngữ cảnh</label>
+                                    <span style="font-size:11px; color:var(--text-muted); display:block;">AI sẽ phân tích ghi chú để tự động xếp loại khách hàng (Ưu tiên, Tạm dừng...). Lưu ý: Sẽ làm chậm quá trình lưu khoảng 2s.</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="setting-use-ai">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Google Drive Sync Setting -->
+                        <div class="glass-card settings-card">
+                            <h4>☁️ Đồng bộ Google Drive</h4>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;">
+                                Lưu trữ và đồng bộ dữ liệu an toàn trên Google Drive cá nhân của bạn.
+                            </p>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                                <div id="drive-sync-status" style="font-weight: 500; font-size: 14px;">🔴 Chưa kết nối</div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-primary" id="btn-drive-login" onclick="DriveSyncModule.handleAuthClick()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 
+                                    Kết nối Google Drive
+                                </button>
+                                <button class="btn-secondary" id="btn-drive-sync-now" style="display:none;" onclick="DriveSyncModule.syncWithDrive()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                    Đồng bộ ngay
+                                </button>
+                                <button class="btn-danger" id="btn-drive-logout" style="display:none;" onclick="DriveSyncModule.handleSignoutClick()">Ngắt kết nối</button>
+                            </div>
+                        </div>
+
+                        <div class="glass-card settings-card">
+                            <h4>📅 Chu kỳ chăm sóc</h4>
+                            
+                            <div style="margin-bottom: 15px; font-size: 14px; color: var(--text-main); background: var(--bg-secondary); padding: 10px; border-radius: var(--border-radius-sm);">
+                                <strong style="display:block; margin-bottom: 5px;">Các mốc chăm sóc tiêu chuẩn:</strong>
+                                <ul style="margin: 0; padding-left: 20px; color: var(--text-muted); line-height: 1.6;">
+                                    <li><strong>Ngày 1:</strong> Hướng dẫn sử dụng</li>
+                                    <li><strong>Ngày 7:</strong> Xử lý khủng hoảng</li>
+                                    <li><strong>Ngày 22/25:</strong> Giữ niềm tin/chốt mới</li>
+                                </ul>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div class="form-group">
+                                    <label>Mốc 1 (Ngày)</label>
+                                    <input type="number" id="setting-care-m1" class="input-field" value="1" min="0" title="Hướng dẫn sử dụng">
+                                </div>
+                                <div class="form-group">
+                                    <label>Mốc 2 (Ngày)</label>
+                                    <input type="number" id="setting-care-m2" class="input-field" value="7" min="0" title="Xử lý khủng hoảng">
+                                </div>
+                                <div class="form-group">
+                                    <label>Mốc 3 (Ngày)</label>
+                                    <input type="number" id="setting-care-m3" class="input-field" value="22" min="0" title="Giữ niềm tin/chốt mới">
+                                </div>
+                                <div class="form-group">
+                                    <label>Chu kỳ lặp lại (Ngày)</label>
+                                    <input type="number" id="setting-care-cycle" class="input-field" value="30" min="1" title="Lặp lại sau mốc 3">
+                                </div>
+                            </div>
+                            <button class="btn-primary btn-sm" id="btn-save-care-cycle">Lưu</button>
+                        </div>
+                        <div class="glass-card settings-card">
+                            <h4>🏷️ Từ khóa ưu tiên</h4>
+                            <div class="form-group">
+                                <label>Danh sách từ khóa (mỗi dòng 1 từ khóa)</label>
+                                <textarea id="setting-keywords" class="input-field" rows="5">hẹn gọi lại
+hỏi giá
+cần tư vấn
+quan tâm
+combo</textarea>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button class="btn-primary btn-sm" id="btn-save-keywords">Lưu</button>
+                                <button class="btn-warning btn-sm" id="btn-scan-priority-keywords" title="Quét toàn bộ Ghi chú của khách hàng để tự động lọc">🔄 Quét dữ liệu cũ</button>
+                            </div>
+                        </div>
+                        <div class="glass-card settings-card">
+                            <h4>🛑 Từ khóa Tạm dừng</h4>
+                            <div class="form-group">
+                                <label>Từ khóa ngừng chăm sóc (mỗi dòng 1 từ khóa)</label>
+                                <textarea id="setting-stop-keywords" class="input-field" rows="5">không dùng nữa
+đã chết
+không uống nữa
+đã mất</textarea>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button class="btn-primary btn-sm" id="btn-save-stop-keywords">Lưu</button>
+                                <button class="btn-warning btn-sm" id="btn-scan-stop-keywords" title="Quét toàn bộ Ghi chú của khách hàng để tự động lọc">🔄 Quét dữ liệu cũ</button>
+                            </div>
+                        </div>
+                        <div class="glass-card settings-card">
+                            <h4>↩️ Từ khóa Hủy/Hoàn</h4>
+                            <div class="form-group">
+                                <label>Từ khóa KH hủy/hoàn (mỗi dòng 1 từ khóa)</label>
+                                <textarea id="setting-cancel-keywords" class="input-field" rows="5">hủy đơn
+hoàn hàng
+không nhận hàng</textarea>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button class="btn-primary btn-sm" id="btn-save-cancel-keywords">Lưu</button>
+                                <button class="btn-warning btn-sm" id="btn-scan-cancel-keywords" title="Quét toàn bộ Ghi chú của khách hàng để tự động lọc">🔄 Quét dữ liệu cũ</button>
+                            </div>
+                        </div>
+                        <div class="glass-card settings-card">
+                            <h4>📉 Từ khóa Không ưu tiên</h4>
+                            <div class="form-group">
+                                <label>Từ khóa giảm ưu tiên (mỗi dòng 1 từ khóa)</label>
+                                <textarea id="setting-non-priority-keywords" class="input-field" rows="5">không có tiền
+chưa muốn mua
+để hỏi vợ
+không mua</textarea>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button class="btn-primary btn-sm" id="btn-save-non-priority-keywords">Lưu</button>
+                                <button class="btn-warning btn-sm" id="btn-scan-non-priority-keywords" title="Quét toàn bộ Ghi chú của khách hàng để tự động lọc">🔄 Quét dữ liệu cũ</button>
+                            </div>
+                        </div>
+                        <div class="glass-card settings-card">
+                            <h4>⭐ Điểm ưu tiên</h4>
+                            <div class="priority-scores" id="priority-scores-config">
+                                <!-- Rendered by JS -->
+                            </div>
+                            <button class="btn-primary btn-sm" id="btn-save-priority">Lưu</button>
+                        </div>
+                        <div class="glass-card settings-card">
+                            <h4>🎯 Ngưỡng Đánh Giá KPI (%)</h4>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Tỷ lệ chuyển đổi (Thấp)</label>
+                                    <input type="number" id="setting-kpi-conv-low" class="input-field" value="15" min="0" max="100">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tỷ lệ chuyển đổi (Cao)</label>
+                                    <input type="number" id="setting-kpi-conv-high" class="input-field" value="30" min="0" max="100">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Tỷ lệ quay lại (Thấp)</label>
+                                    <input type="number" id="setting-kpi-ret-low" class="input-field" value="5" min="0" max="100">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tỷ lệ quay lại (Cao)</label>
+                                    <input type="number" id="setting-kpi-ret-high" class="input-field" value="20" min="0" max="100">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Tỷ lệ khách cũ/mới (Thấp)</label>
+                                    <input type="number" id="setting-kpi-newold-low" class="input-field" value="15" min="0" max="100">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tỷ lệ khách cũ/mới (Cao)</label>
+                                    <input type="number" id="setting-kpi-newold-high" class="input-field" value="50" min="0" max="100">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Tỷ lệ KH từ chối (Thấp)</label>
+                                    <input type="number" id="setting-kpi-drop-low" class="input-field" value="20" min="0" max="100">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tỷ lệ KH từ chối (Cao)</label>
+                                    <input type="number" id="setting-kpi-drop-high" class="input-field" value="50" min="0" max="100">
+                                </div>
+                            </div>
+
+                            <button class="btn-primary btn-sm" id="btn-save-kpi">Lưu</button>
+                        </div>
+                        <div class="glass-card settings-card">
+                            <h4>🚀 Ngưỡng Đánh Giá Leading Indicators</h4>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Lead mới/ngày (Thấp)</label>
+                                    <input type="number" id="setting-lead-low" class="input-field" value="2" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Lead mới/ngày (Cao)</label>
+                                    <input type="number" id="setting-lead-high" class="input-field" value="5" min="0">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>TG phản hồi (Tốt - Phút)</label>
+                                    <input type="number" id="setting-res-low" class="input-field" value="15" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>TG phản hồi (Chậm - Phút)</label>
+                                    <input type="number" id="setting-res-high" class="input-field" value="60" min="0">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Hoạt động/kỳ (Thấp)</label>
+                                    <input type="number" id="setting-act-low" class="input-field" value="50" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Hoạt động/kỳ (Cao)</label>
+                                    <input type="number" id="setting-act-high" class="input-field" value="200" min="0">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Mất khách (Thấp - %)</label>
+                                    <input type="number" id="setting-drop-lead-low" class="input-field" value="20" min="0" max="100">
+                                </div>
+                                <div class="form-group">
+                                    <label>Mất khách (Cao - %)</label>
+                                    <input type="number" id="setting-drop-lead-high" class="input-field" value="50" min="0" max="100">
+                                </div>
+                            </div>
+
+                            <button class="btn-primary btn-sm" id="btn-save-leading-kpi">Lưu</button>
+                        </div>
+                        <div class="glass-card settings-card">
+                            <h4>📊 Dữ liệu mẫu</h4>
+                            <p style="margin-bottom: 1rem; opacity: 0.7;">Tạo dữ liệu giả lập để test ứng dụng</p>
+                            <button class="btn-warning btn-sm" id="btn-seed-data">🔄 Tạo dữ liệu mẫu</button>
+                            <button class="btn-danger btn-sm" id="btn-clear-data" style="margin-top: 0.5rem;">🗑️ Xóa toàn bộ dữ liệu</button>
+                        </div>
+                        <div class="glass-card settings-card">
+                            <h4>📦 Cài đặt sản phẩm</h4>
+                            <p style="margin-bottom: 1rem; opacity: 0.7;">Thêm, sửa, xóa sản phẩm và thiết lập liều dùng.</p>
+                            <button class="btn-primary btn-sm" onclick="App.navigateTo('products')">Cài đặt sản phẩm</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-top: 24px;">
+                        <h4>💰 Bảng Tính Thu Nhập Cá Nhân</h4>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px;">
+                            <div style="display: flex; flex-direction: column; gap: 12px; background: rgba(0,0,0,0.02); padding: 20px; border-radius: 8px;">
+                                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom:0;">
+                                    <label style="margin-bottom:0; font-weight: 600; color: var(--color-primary);">0. Doanh số (Mở)</label>
+                                    <input type="number" id="calc-revenue" class="input-field" value="0" style="width: 150px; text-align: right; border: 2px solid var(--color-primary); font-weight: bold; background: rgba(128, 90, 213, 0.05);">
+                                </div>
+                                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom:0;">
+                                    <label style="margin-bottom:0; font-weight: 500;">1. Lương cứng</label>
+                                    <input type="number" id="calc-base" class="input-field" value="5500000" style="width: 150px; text-align: right;">
+                                </div>
+                                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom:0;">
+                                    <label style="margin-bottom:0; font-weight: 500;">2. Lương KPI</label>
+                                    <input type="number" id="calc-kpi" class="input-field" value="0" style="width: 150px; text-align: right;">
+                                </div>
+                                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom:0;">
+                                    <label style="margin-bottom:0; font-weight: 500;">3. Hoa hồng</label>
+                                    <input type="number" id="calc-commission" class="input-field" value="0" style="width: 150px; text-align: right;">
+                                </div>
+                                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom:0;">
+                                    <label style="margin-bottom:0; font-weight: 500;">4. Thưởng</label>
+                                    <input type="number" id="calc-bonus" class="input-field" value="0" style="width: 150px; text-align: right;">
+                                </div>
+                                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom:0;">
+                                    <label style="margin-bottom:0; font-weight: 500;">5. Ngày công (Nhập số âm)</label>
+                                    <div style="display: flex; gap: 5px; align-items: center;">
+                                        <input type="number" id="calc-days" class="input-field" value="0" placeholder="VD: -2" style="width: 65px; text-align: center;" title="Nhập số âm để trừ lương">
+                                        <span style="font-size: 12px; color: var(--text-muted);">x</span>
+                                        <input type="number" id="calc-daily-wage" class="input-field" value="230000" style="width: 80px; text-align: right;" title="Giá trị 1 ngày công">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(128, 90, 213, 0.1); padding: 20px; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid rgba(128, 90, 213, 0.2);">
+                                <h4 style="margin-bottom: 20px; color: var(--color-purple); text-align: center;">TỔNG THU NHẬP ƯỚC TÍNH</h4>
+                                <strong id="res-calc-total" style="font-size: 42px; color: var(--color-primary); line-height: 1;">0 đ</strong>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== PROMOTIONS PAGE ===== -->
+                <section id="page-promotions" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Chương trình ưu đãi</h3>
+                            <p class="page-subtitle">Thiết lập bảng giá và số lượng tặng cho các sản phẩm</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn-primary" id="btn-save-promotions">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                Lưu cấu hình
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-grid" id="promotions-grid">
+                        <!-- Render via JS -->
+                    </div>
+                </section>
+
+                <!-- ===== DRILL-DOWN PAGE (Dynamic) ===== -->
+                <section id="page-drilldown" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <button class="btn-back" id="btn-drilldown-back">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+                                Quay lại
+                            </button>
+                            <h3 id="drilldown-title">Chi tiết</h3>
+                        </div>
+                    </div>
+                    <div class="filter-bar glass-card">
+                        <div class="filter-row">
+                            <div class="search-box filter-search">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="drilldown-search" placeholder="Tìm kiếm..." autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container glass-card">
+                        <table class="data-table" id="drilldown-table">
+                            <thead id="drilldown-thead"></thead>
+                            <tbody id="drilldown-tbody"></tbody>
+                        </table>
+                        <div class="pagination" id="drilldown-pagination"></div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+    <!-- Generic Modal -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div id="modal-container" class="modal-container glass-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Modal</h3>
+                <button class="modal-close" id="modal-close" onclick="Utils.closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div id="confirm-overlay" class="modal-overlay">
+        <div class="confirm-dialog glass-card">
+            <div class="confirm-icon" id="confirm-icon">⚠️</div>
+            <h3 id="confirm-title">Xác nhận</h3>
+            <p id="confirm-message">Bạn có chắc chắn?</p>
+            <div class="confirm-actions">
+                <button class="btn-secondary" id="confirm-cancel">Hủy</button>
+                <button class="btn-danger" id="confirm-ok">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CỐ VẤN AI SIDE PANEL ===== -->
+    <div id="covan-overlay" class="covan-overlay">
+        <div id="covan-panel" class="covan-panel glass-card">
+            <div class="covan-header">
+                <div class="covan-header-left">
+                    <span class="covan-header-icon">✨</span>
+                    <div>
+                        <h3 class="covan-title">Cố vấn AI</h3>
+                        <p class="covan-subtitle">Giám đốc Kinh doanh TPCN • 16 năm kinh nghiệm</p>
+                    </div>
+                </div>
+                <button id="covan-close" class="covan-close" title="Đóng">&times;</button>
+            </div>
+            <div class="covan-body" id="covan-content">
+                <!-- Rendered by JS -->
+            </div>
+            <!-- Khung chat với AI -->
+            <div class="covan-footer" id="covan-footer" style="display: none; padding: 15px; border-top: 1px solid var(--border-color); background: var(--bg-primary); display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="covan-chat-input" placeholder="Hỏi thêm Cố vấn AI..." style="flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); outline: none;" onkeypress="if(event.key === 'Enter') CoVanAiModule.submitChat()">
+                <button id="covan-chat-send" onclick="CoVanAiModule.submitChat()" style="background: var(--color-primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Quick Add Menu -->
+    <div id="quick-add-menu" class="quick-add-menu" style="display:none;">
+        <a href="#" id="quick-add-customer" class="quick-add-item" data-action="add-customer">👤 Thêm khách hàng</a>
+        <a href="#" id="quick-add-product" class="quick-add-item" data-action="add-product">📦 Thêm sản phẩm</a>
+        <a href="#" id="quick-add-order" class="quick-add-item" data-action="add-order">🛒 Tạo đơn hàng</a>
+        <a href="#" id="quick-add-template" class="quick-add-item" data-action="add-template">✉️ Thêm mẫu tin nhắn</a>
+    </div>
+
+    <!-- External Libraries for File Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+
+    <!-- Scripts -->
+    <script src="modules/utils.js?v=2.6"></script>
+    <script src="modules/database.js?v=2.3"></script>
+    <script src="modules/customers.js?v=2.5"></script>
+    <script src="modules/products.js?v=1.6"></script>
+    <script src="modules/orders.js?v=2.3"></script>
+    <script src="modules/care.js?v=2.5"></script>
+    <script src="modules/stopped.js?v=2.3"></script>
+    <script src="modules/cancelled.js?v=1.0"></script>
+    <script src="modules/transferred.js?v=2.3"></script>
+    <script src="modules/zalo.js?v=2.1"></script>
+    <script src="modules/revenue.js?v=2.1"></script>
+    <script src="modules/charts.js?v=5"></script>
+    <script src="modules/ai-analysis.js?v=2.1"></script>
+    <script src="modules/ai-import.js?v=2.1"></script>
+    <script src="modules/backup.js?v=2.1"></script>
+    <script src="modules/remedies.js?v=1.0"></script>
+    <script src="modules/drive-sync.js?v=1.0"></script>
+    <script src="modules/settings.js?v=4"></script>
+    <script src="modules/promotions.js?v=1.0"></script>
+    <script src="modules/co-van-ai.js?v=1.1"></script>
+    <script src="modules/ai-history.js?v=1.0"></script>
+    <script src="modules/dashboard.js?v=2.3"></script>
+    <script src="app.js?v=2.8"></script>
+</body>
+</html>
