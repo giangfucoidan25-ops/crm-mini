@@ -1,0 +1,39 @@
+getCareStatus(customer, config = { cycle: 30 }) {
+        const lastOrder = customer.last_completed_order_date;
+        const lastContact = customer.last_contact_date;
+        const cycle = config.cycle || 30;
+        
+        if (!lastOrder) {
+            // Khách chưa có đơn hàng "Đã nhận", sử dụng chu kỳ 7 ngày đếm từ ngày contact cuối
+            const unpurchasedCycle = 7;
+            const fallbackMilestone = { label: 'W', name: 'Chăm sóc tuần (Chưa mua)', color: '#007bff' };
+            if (!lastContact) return { status: 'never', label: 'Chưa chăm sóc', class: 'badge-alert', overdue: true, milestone: fallbackMilestone };
+            const daysAgo = this.daysAgo(lastContact);
+            if (daysAgo > unpurchasedCycle) return { status: 'overdue', label: `Quá hạn ${daysAgo - unpurchasedCycle} ngày`, class: 'badge-alert', overdue: true, milestone: fallbackMilestone };
+            if (daysAgo >= unpurchasedCycle - 2) return { status: 'due', label: 'Sắp đến hạn', class: 'badge-warning', overdue: false, milestone: fallbackMilestone };
+            return { status: 'ok', label: `${unpurchasedCycle - daysAgo} ngày nữa`, class: 'badge-success', overdue: false, milestone: fallbackMilestone };
+        }
+        
+        const milestone = this.getNextCareMilestone(lastOrder, lastContact, config);
+        const daysToNext = this.daysFromNow(milestone.date);
+        
+        let statusObj = { milestone: milestone };
+        
+        if (daysToNext < 0) {
+            statusObj.status = 'overdue';
+            statusObj.label = `Quá hạn ${Math.abs(daysToNext)} ngày`;
+            statusObj.class = 'badge-alert';
+            statusObj.overdue = true;
+        } else if (daysToNext <= 3) {
+            statusObj.status = 'due';
+            statusObj.label = daysToNext === 0 ? 'Hôm nay' : `Sắp đến (${daysToNext} ngày)`;
+            statusObj.class = 'badge-warning';
+            statusObj.overdue = false;
+        } else {
+            statusObj.status = 'ok';
+            statusObj.label = `${daysToNext} ngày nữa`;
+            statusObj.class = 'badge-success';
+            statusObj.overdue = false;
+        }
+        return statusObj;
+    },

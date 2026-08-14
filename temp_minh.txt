@@ -1,0 +1,87 @@
+{
+  "cust": {
+    "id": 118,
+    "full_name": "Minh Minh",
+    "phone": "0902392828",
+    "zalo_phone": "0902392828",
+    "email": "",
+    "address": "Số 413, đường 30/4, Khóm 1, Thị trấn Cái Nước, Huyện Cái Nước, Tỉnh Cà Mau.",
+    "customer_source": "other",
+    "status": "purchased",
+    "tags": "",
+    "note": "5,190,000",
+    "last_contact_date": "2026-05-28",
+    "next_care_date": "2026-05-29",
+    "care_cycle_days": 30,
+    "created_at": "2026-06-28T00:02:25.252704Z",
+    "updated_at": "2026-07-02T08:15:20.925Z",
+    "total_revenue": 5190000,
+    "total_orders": 1,
+    "priority_score": 0,
+    "overdue_status": false,
+    "transferred_status": false,
+    "stopped_status": false,
+    "last_order_date": "2026-05-28",
+    "last_product_used": "Chưa xác định",
+    "keyword_category": "PRIORITY",
+    "last_completed_order_date": "2026-05-28",
+    "getfly_url": "https://fucoidan2026.getflycrm.com/#/crm/view_account/243694",
+    "product_expiries": {
+      "Chưa xác định": "2026-06-27"
+    },
+    "estimated_product_end_date": "2026-06-27"
+  },
+  "logs": [
+    {
+      "customer_id": 118,
+      "care_date": "2026-06-13",
+      "care_type": "Nhắn tin Zalo",
+      "note": "Hà Giang Fucoidan | 13/06/2026 16:09\nchị đang dùng, 2 lần, dùng gần buổi trưa 11 giờ. và chiều tối. Dùng bình thường. Chị đang ăn 16-8. Đã tư vấn chị",
+      "created_at": "2026-06-13T16:09:00.000Z",
+      "id": 883
+    },
+    {
+      "customer_id": 118,
+      "care_date": "2026-05-28",
+      "care_type": "Nhắn tin Zalo",
+      "note": "Hà Giang Fucoidan | 28/05/2026 18:35\nChị thấy bên khác báo rẻ hơn. Đã tư vấn chị sp trên thị trường có nhiều loại, nhiều mức giá khác nhau, so sánh cho chị về hàm lượng thành phần. Chị lấy 8t5 + 1 đường mía",
+      "created_at": "2026-05-28T18:35:00.000Z",
+      "id": 884
+    },
+    {
+      "customer_id": 118,
+      "care_date": "2026-05-28",
+      "care_type": "Nhắn tin Zalo",
+      "note": "Hà Giang Fucoidan | 28/05/2026 15:05\nDùng tăng cường sk, đang có u ngực, lành tính. Trước dùng thuốc tây nhưng đã dừng lâu. Đã theo dõi thầy Vượng và sản phẩm từ lâu nhưng không dám mua vì sợ hàng giả. Gửi combo và thông tin qua zalo cho chị",
+      "created_at": "2026-05-28T15:05:00.000Z",
+      "id": 885
+    },
+    {
+      "customer_id": 118,
+      "care_date": "2026-05-28",
+      "care_type": "Ghi chú",
+      "note": "Hà Nguyệt | 28/05/2026 14:49\nTạo mới khách hàng",
+      "created_at": "2026-05-28T14:49:00.000Z",
+      "id": 886
+    }
+  ],
+  "orders": [
+    {
+      "id": 128,
+      "customer_id": 118,
+      "product_id": 2,
+      "product_name": "Chưa xác định",
+      "order_date": "2026-05-28",
+      "quantity": 1,
+      "unit_price": 5190000,
+      "discount": 0,
+      "total_amount": 5190000,
+      "order_status": "completed",
+      "estimated_product_end_date": "2026-06-27",
+      "cancel_reason": "",
+      "note": "Imported from Feb Excel Sheet",
+      "created_at": "2026-06-28T00:02:25.259556Z",
+      "updated_at": "2026-06-28T00:02:25.259556Z"
+    }
+  ]
+}

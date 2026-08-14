@@ -1,0 +1,149 @@
+[
+  {
+    "customer_id": 157,
+    "care_date": "",
+    "care_type": "Khác",
+    "note": "Hà Giang Fucoidan | 17 giờ trước\nĐăng ký cho cô 6t3",
+    "created_at": "2026-07-01T07:14:58.340Z",
+    "id": 547
+  },
+  {
+    "customer_id": 157,
+    "care_date": "",
+    "care_type": "Khác",
+    "note": "Hà Giang Fucoidan | 17 giờ trước\nCNM",
+    "created_at": "2026-07-01T07:14:58.354Z",
+    "id": 548
+  },
+  {
+    "customer_id": 157,
+    "care_date": "",
+    "care_type": "Khác",
+    "note": "Hà Giang Fucoidan | 18 giờ trước\nCô ăn cơm đã nhé. Nhà cô ăn muộn",
+    "created_at": "2026-07-01T07:14:58.363Z",
+    "id": 549
+  },
+  {
+    "customer_id": 157,
+    "care_date": "",
+    "care_type": "Khác",
+    "note": "Hà Giang Fucoidan | 22 giờ trước\nCô còn 1 hộp. Dùng hạn chế vì hết tài khoản rồi. Đã tư vấn lại cô chương trình ưu đãi. Cô quan tâm 6t3 + viên nang sâm. Gửi hình ảnh Viên nang sâm qua zalo cho cô",
+    "created_at": "2026-07-01T07:14:58.374Z",
+    "id": 550
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2026-05-08",
+    "care_type": "Khác",
+    "note": "Hà Giang Fucoidan | 08/05/2026 16:21\nNgày mệt dùng 2 cốc, ko thì 1 cốc. Cô ngưng thuốc tây nửa tháng nay. Cô tháy đường vẫn bình thường thế, tiểu đường duy trì 7-8. Sk bình thường. Đã tư vấn lại cô có thể dùng thêm trứng gà bổ sung sk",
+    "created_at": "2026-05-08T16:21:00.000Z",
+    "id": 551
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2026-03-11",
+    "care_type": "Khác",
+    "note": "Hà Giang Fucoidan | 11/03/2026 16:01\nCô dùng bình thường. Ngày 1-2 cốc, 9-10 giờ cô dùng 1 cốc khi đói. Sáng cô vẫn ăn sáng bánh bì, cơm, bún. Cô có tiểu dường 7-8 chấm. Đã tư vấn lại cô dùng ổn định",
+    "created_at": "2026-03-11T16:01:00.000Z",
+    "id": 552
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2026-02-09",
+    "care_type": "Khác",
+    "note": "Hà Giang Fucoidan | 09/02/2026 07:41\nĐiều trị hoàn tất từ 2024, đã dùng fucoidan rẻ hơn ko có nano. Sk cô tốt. Uống cái này cũng thấy thơm ngon. Cô thấy bên cháu có nano muốn chuyển sang dùng thử. Cô lấy 3t1",
+    "created_at": "2026-02-09T07:41:00.000Z",
+    "id": 553
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2026-02-09",
+    "care_type": "Khác",
+    "note": "Lường Văn Cường | 09/02/2026 00:25\nKhavhs để lại tt nha a\nHà Giang Fucoidan.",
+    "created_at": "2026-02-09T00:25:00.000Z",
+    "id": 554
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2024-12-23",
+    "care_type": "Khác",
+    "note": "Nguyễn Lan ( Nghỉ ) | 23/12/2024 09:01\nu nang buồng trứng, đã mổ rồi, hoá trị 3 lần, đang tìm hiểu thuốc điều trị, rất quan tâm nhưng giá cao quá , vừa tiền truyền hoá chất vừa tiền thuốc thì ko có kinh tế",
+    "created_at": "2024-12-23T09:01:00.000Z",
+    "id": 555
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2024-12-22",
+    "care_type": "Khác",
+    "note": "Lường Văn Cường | 22/12/2024 21:57\nTạo mới khách hàng .",
+    "created_at": "2024-12-22T21:57:00.000Z",
+    "id": 556
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2026-07-01",
+    "care_type": "Gọi điện",
+    "note": "Đã lên đơn 6t3 nhưng cô băn khoăn muốn rút xuống 4t2.",
+    "created_at": "2026-07-01T07:47:24.517Z",
+    "id": 557
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2026-07-01",
+    "care_type": "Gọi điện",
+    "note": "Chốt cô trước 10/7",
+    "created_at": "2026-07-01T07:47:44.491Z",
+    "id": 558
+  },
+  {
+    "id": 577,
+    "customer_id": 157,
+    "care_date": "2026-03-11",
+    "care_type": "Nhắn tin Zalo",
+    "note": "11/3 Cô dùng bình thường. Ngày 1-2 cốc, 9-10 giờ cô dùng 1 cốc khi đói. Sáng cô vẫn ăn sáng bánh bì, cơm, bún. Cô có tiểu dường 7-8 chấm. Đã tư vấn lại cô dùng ổn định",
+    "created_at": "2026-07-01T21:46:35.464976Z"
+  },
+  {
+    "id": 578,
+    "customer_id": 157,
+    "care_date": "2026-04-18",
+    "care_type": "Nhắn tin Zalo",
+    "note": "18/4 tái 4 tặng 2",
+    "created_at": "2026-07-01T21:46:35.464976Z"
+  },
+  {
+    "id": 579,
+    "customer_id": 157,
+    "care_date": "2026-08-05",
+    "care_type": "Nhắn tin Zalo",
+    "note": "5/8  Ngày mệt dùng 2 cốc, ko thì 1 cốc. Cô ngưng thuốc tây nửa tháng nay. Cô tháy đường vẫn bình thường thế, tiểu đường duy trì 7-8. Sk bình thường. Đã tư vấn lại cô có thể dùng thêm trứng gà bổ sung sk",
+    "created_at": "2026-07-01T21:46:35.464976Z"
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2026-07-16",
+    "care_type": "Nhắn tin Zalo",
+    "note": "Hà Giang Fucoidan | 16/07/2026 16:19\n6t3 nhiều quá. Thôi cho cô lấy 4t2",
+    "created_at": "2026-07-16T16:19:00.000Z",
+    "is_remedy": false,
+    "id": 1501
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2026-07-11",
+    "care_type": "Nhắn tin Zalo",
+    "note": "Hà Giang Fucoidan | 11/07/2026 14:44\nCNM",
+    "created_at": "2026-07-11T14:44:00.000Z",
+    "is_remedy": false,
+    "id": 1502
+  },
+  {
+    "customer_id": 157,
+    "care_date": "2026-07-07",
+    "care_type": "Nhắn tin Zalo",
+    "note": "Hà Giang Fucoidan | 07/07/2026 08:54\nCô chưa có lương. Mấy ngày nữa mới có 5 ngày hoặc tuần nữa",
+    "created_at": "2026-07-07T08:54:00.000Z",
+    "is_remedy": false,
+    "id": 1503
+  }
+]

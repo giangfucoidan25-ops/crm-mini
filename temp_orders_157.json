@@ -1,0 +1,89 @@
+[
+  {
+    "customer_id": 157,
+    "items": [
+      {
+        "product_id": 1,
+        "product_name": "Nutri Nano Fucoidan",
+        "quantity": 4,
+        "unit_price": 630000,
+        "is_gift": false
+      },
+      {
+        "product_id": 1,
+        "product_name": "Nutri Nano Fucoidan",
+        "quantity": 2,
+        "unit_price": 0,
+        "is_gift": true
+      },
+      {
+        "product_id": 1,
+        "product_name": "Nutri Nano Fucoidan",
+        "quantity": 3,
+        "unit_price": 0,
+        "is_gift": true
+      },
+      {
+        "product_id": 4,
+        "product_name": "Đông trùng hạ thảo",
+        "quantity": 1,
+        "unit_price": 0,
+        "is_gift": true
+      }
+    ],
+    "product_id": 1,
+    "product_name": "Nutri Nano Fucoidan",
+    "order_date": "2026-07-01",
+    "quantity": 10,
+    "unit_price": 630000,
+    "discount": 0,
+    "total_amount": 2520000,
+    "order_status": "cancelled",
+    "estimated_product_end_date": "2026-09-29",
+    "cancel_reason": "cô đổi 4/2 mấy hôm nữa có tiền cô lấy",
+    "note": "",
+    "created_at": "2026-07-01T07:08:58.655Z",
+    "updated_at": "2026-07-07T08:19:15.387Z",
+    "id": 179
+  },
+  {
+    "customer_id": 157,
+    "items": [
+      {
+        "product_id": 1,
+        "product_name": "Nutri Nano Fucoidan",
+        "quantity": 3,
+        "unit_price": 630000,
+        "is_gift": false
+      },
+      {
+        "product_id": 1,
+        "product_name": "Nutri Nano Fucoidan",
+        "quantity": 1,
+        "unit_price": 0,
+        "is_gift": true
+      },
+      {
+        "product_id": 1,
+        "product_name": "Nutri Nano Fucoidan",
+        "quantity": 2,
+        "unit_price": 0,
+        "is_gift": true
+      }
+    ],
+    "product_id": 1,
+    "product_name": "Nutri Nano Fucoidan",
+    "order_date": "2026-07-16",
+    "quantity": 6,
+    "unit_price": 630000,
+    "discount": 0,
+    "total_amount": 1890000,
+    "order_status": "completed",
+    "estimated_product_end_date": "2026-09-14",
+    "cancel_reason": "",
+    "note": "",
+    "created_at": "2026-07-16T09:30:21.003Z",
+    "updated_at": "2026-07-27T09:39:29.238Z",
+    "id": 187
+  }
+]

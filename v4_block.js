@@ -1,0 +1,189 @@
+                    const hhExcelFixedV5 = localStorage.getItem('hh_excel_fixed_v5');
+                    if (!hhExcelFixedV5) {
+                        let hhCustomer = await DB.db.customers.where('phone').equals('0984757580').first();
+                        if (hhCustomer) {
+                            const logs = await DB.db.care_logs.where('customer_id').equals(hhCustomer.id).toArray();
+                            for (let log of logs) { await DB.db.care_logs.delete(log.id); }
+                            const newLogs = [
+    {
+        "date": "2026-06-25",
+        "note": "Hà Giang Fucoidan - 25/06/2026 16:40\ndùng 3 tuần dùng ngày 4/viên, sau đó dùng ngày 6 viên. Chị dùng sau ăn 1 tiếng. ngủ đến 3 giờ sáng thức giấc. Nóng người. Đã tư vấn lại chị"
+    },
+    {
+        "date": "2026-06-22",
+        "note": "Hà Giang Fucoidan - 22/06/2026 10:15"
+    },
+    {
+        "date": "2026-06-17",
+        "note": "Hà Giang Fucoidan - 17/06/2026 16:43"
+    },
+    {
+        "date": "2026-06-11",
+        "note": "Hà Giang Fucoidan - 11/06/2026 09:04\nChị đang uống sữa non thực vật. Chị muốn dùng bổ sung thêm. Chăm sóc cơ thể. Chắc có chăm thì nó cũng tốt hơn. Tiền thiếu thì nhờ con cái. Gửi combo cho chị chọn"
+    },
+    {
+        "date": "2026-06-11",
+        "note": "Nguyễn Đoàn - 11/06/2026 08:56\nkh để tt nutri a nhé\n\nHà Giang Fucoidan."
+    },
+    {
+        "date": "2026-06-08",
+        "note": "Hà Giang Fucoidan - 08/06/2026 09:38\nChị thấy sp funano chị tham khảo. Chị vẫn đi hơi nhão. Đã tư vấn lại chị. Gửi thông tin funano cho chị qua zalo"
+    },
+    {
+        "date": "2026-06-08",
+        "note": "Nguyễn Đoàn - 08/06/2026 09:30\nkh để tt fucoidan\n\nHà Giang Fucoidan."
+    },
+    {
+        "date": "2026-05-30",
+        "note": "Hà Giang Fucoidan - 30/05/2026 12:44\nChị làm giáo viên. U tuyến giáp lành tính. Ko mổ. Trc có dùng 1 đợt thuốc sau ko dùng nữa. Sk bình thường. Thi thoảng đau họng. Đã tư vấn chị fu8 và ancan. Chị chọn fu8."
+    },
+    {
+        "date": "2026-05-30",
+        "note": "Hà Giang Fucoidan - 30/05/2026 12:12"
+    },
+    {
+        "date": "2026-05-30",
+        "note": "Nguyễn Đoàn - 30/05/2026 12:09\nkh để tt\n\nHà Giang Fucoidan."
+    },
+    {
+        "date": "2025-11-17",
+        "note": "Hà Giang Fucoidan - 17/11/2025 20:45"
+    },
+    {
+        "date": "2025-11-14",
+        "note": "Hà Giang Fucoidan - 14/11/2025 20:23"
+    },
+    {
+        "date": "2025-11-13",
+        "note": "Hà Giang Fucoidan - 13/11/2025 16:26"
+    },
+    {
+        "date": "2025-11-13",
+        "note": "Hà Giang Fucoidan - 13/11/2025 11:15"
+    },
+    {
+        "date": "2025-11-13",
+        "note": "Hà Giang Fucoidan - 13/11/2025 08:55"
+    },
+    {
+        "date": "2025-11-13",
+        "note": "Nguyễn Đoàn - 13/11/2025 08:49"
+    },
+    {
+        "date": "2025-11-13",
+        "note": "Nguyễn Đoàn - 13/11/2025 08:48\nkh để tt\n\nHà Giang Fucoidan."
+    },
+    {
+        "date": "2025-11-11",
+        "note": "Hà Giang Fucoidan - 11/11/2025 20:35"
+    },
+    {
+        "date": "2025-11-09",
+        "note": "Hà Giang Fucoidan - 09/11/2025 09:24"
+    },
+    {
+        "date": "2025-11-08",
+        "note": "Hà Giang Fucoidan - 08/11/2025 20:47"
+    },
+    {
+        "date": "2025-11-08",
+        "note": "Hà Giang Fucoidan - 08/11/2025 16:00"
+    },
+    {
+        "date": "2025-11-08",
+        "note": "Hà Nguyệt - 08/11/2025 15:42\nKH để lại tt\n\nHà Giang Fucoidan."
+    },
+    {
+        "date": "2025-11-08",
+        "note": "Hà Giang Fucoidan - 08/11/2025 11:06\nCô nghi K giáp mấy năm nay nhưng không mổ, chọn dùng dinh dưỡng, thuốc nam thay đổi chế độ ăn uống tập luyện duy trì sk. Có Bsi bị K giáp cũng ko mổ nên cô làm theo. Giới thiệu cô Fu8 nâng cấp. Gửi thông tin zalo cho cô"
+    },
+    {
+        "date": "2025-11-08",
+        "note": "Lường Văn Cường - 08/11/2025 10:42\nkhách để lai tt nhé a @\n\nHà Giang Fucoidan."
+    },
+    {
+        "date": "2024-12-06",
+        "note": "Hà Giang Fucoidan - 06/12/2024 16:44"
+    },
+    {
+        "date": "2024-12-06",
+        "note": "Nguyễn Đoàn - 06/12/2024 16:40\nMạnh dạn gửi Cô đơn 49tr"
+    },
+    {
+        "date": "2024-12-06",
+        "note": "Hà Giang Fucoidan - 06/12/2024 16:39\nCô bị k giáp, hàm lượng fucoinano như các cháu nói có chuẩn ko vì em cô cũng làm trong nghành này, gửi thêm thông tin qua zalo cho cô"
+    },
+    {
+        "date": "2024-12-06",
+        "note": "Hà Giang Fucoidan - 06/12/2024 11:49"
+    },
+    {
+        "date": "2024-12-06",
+        "note": "Nguyễn Đoàn - 06/12/2024 11:41 (Đã chỉnh sửa)\nkh để lại tt nutri nano e nhé\n\nNguyễn Quyết."
+    },
+    {
+        "date": "2024-12-06",
+        "note": "Nguyễn Đoàn - 06/12/2024 11:41\nBn 1 hộp"
+    },
+    {
+        "date": "2024-12-02",
+        "note": "Hà Giang Fucoidan - 02/12/2024 08:21"
+    },
+    {
+        "date": "2024-12-02",
+        "note": "Nguyễn Đoàn - 02/12/2024 08:08 (Đã chỉnh sửa)\nkh để lại tt nutri nano em nhé\n\nNguyễn Quyết."
+    },
+    {
+        "date": "2021-10-22",
+        "note": "Trần Minh Tuấn - 22/10/2021 15:12"
+    },
+    {
+        "date": "2021-08-12",
+        "note": "Trần Thị Liên - 12/08/2021 09:59\nknm. nhắn zalo k trả lời"
+    },
+    {
+        "date": "2021-08-05",
+        "note": "Trần Thị Liên - 05/08/2021 10:52"
+    },
+    {
+        "date": "2021-05-27",
+        "note": "Trần Thị Liên - 27/05/2021 11:13 (Đã chỉnh sửa)"
+    },
+    {
+        "date": "2021-05-08",
+        "note": "Trần Thị Liên - 08/05/2021 10:45"
+    },
+    {
+        "date": "2021-04-16",
+        "note": "Trần Thị Liên - 16/04/2021 16:21"
+    },
+    {
+        "date": "2021-04-13",
+        "note": "Nguyễn Huệ Chi - 13/04/2021 18:50 (Đã chỉnh sửa)\nchị tư vấn thêm Ancan lúc 4 5h chiều nhé\n\nLiên Nutriancan."
+    },
+    {
+        "date": "2021-03-22",
+        "note": "Trần Thị Liên - 22/03/2021 14:51"
+    },
+    {
+        "date": "2021-03-22",
+        "note": "Phạm Tố Uyên - 22/03/2021 14:44 (Đã chỉnh sửa)\ne gọi lại cho khách nhé, khách đê lại số trên zalo\n\nLiên Nutriancan."
+    },
+    {
+        "date": "2021-03-20",
+        "note": "Trần Thị Liên - 20/03/2021 09:52\nk tuyến giáp. phát hiện 4 tháng kt 1 bên 0,44cm x 0,36cm 1 bên 0,36 x 0,91 đang uống thuốc nam.alphalipid. thấy kt u cũng giảm nhiều. chị lấy trước nutriancan. còn viên uống ancan thì từ từ c tìm hiểu thêm"
+    }
+];
+                            for (let item of newLogs) {
+                                await DB.db.care_logs.add({
+                                    customer_id: hhCustomer.id,
+                                    care_date: item.date,
+                                    care_type: "Khác",
+                                    note: item.note,
+                                    created_at: new Date().toISOString()
+                                });
+                            }
+                        }
+                        localStorage.setItem('hh_excel_fixed_v5', 'done');
+                        console.log('Fixed Hương Hoàng logs directly (V5)');
+                    }

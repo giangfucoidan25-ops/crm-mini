@@ -1,0 +1,4 @@
+async addCareLog(log) {
+        if (!log.created_at) {
+            log.created_at = new Date().toISOString();
+        }

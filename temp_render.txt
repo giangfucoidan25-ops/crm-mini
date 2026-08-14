@@ -1,0 +1,21 @@
+async render() {
+this.renderTable(customers);
+renderTable(customers) {
+Utils.renderPagination('customers-pagination', this.currentPag
+this.render();
+this.render();
+DashboardModule.render();
+this.renderCustomerDetailPage(id);
+async renderCustomerDetailPage(id) {
+if (window.CareModule && typeof CareModule.render === 'function') {
+CareModule.render();
+this.render();
+this.render();
+DashboardModule.render();
+Utils.debounce(() => { this.currentPage = 1; this.render(); }, 300);
+ener('change', () => { this.currentPage = 1; this.render(); });
+ener('change', () => { this.currentPage = 1; this.render(); });
+ener('change', () => { this.currentPage = 1; this.render(); });
+ener('change', () => { this.currentPage = 1; this.render(); });
+this.render();
+this.renderCustomerDetailPage(customerId);

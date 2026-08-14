@@ -1,0 +1,33 @@
+{
+  "id": 2,
+  "full_name": "Nguyễn Thị Trinh",
+  "phone": "0703336193",
+  "zalo_phone": "0703336193",
+  "email": "",
+  "address": "Ấp 2, xã Sông Trầu, Trảng Bom, Đồng Nai",
+  "customer_source": "other",
+  "status": "repurchased",
+  "tags": "",
+  "note": "Nhận\n2,480,000\n630\n1,260,000",
+  "last_contact_date": "2025-10-30",
+  "next_care_date": "2026-05-14",
+  "care_cycle_days": 30,
+  "created_at": "2026-06-24T10:46:15.817506Z",
+  "updated_at": "2026-07-02T04:15:26.709Z",
+  "total_revenue": 4370000,
+  "total_orders": 3,
+  "priority_score": 0,
+  "overdue_status": false,
+  "transferred_status": false,
+  "last_order_date": "2026-05-13",
+  "last_product_used": "Nutri Nano Fucoidan",
+  "keyword_category": "PRIORITY",
+  "last_completed_order_date": "2026-05-13",
+  "getfly_url": "https://fucoidan2026.getflycrm.com/#/crm/view_account/213187",
+  "stopped_status": false,
+  "estimated_product_end_date": "2026-05-23",
+  "manual_stopped": true,
+  "product_expiries": {
+    "Nutri Nano Fucoidan": "2026-05-23"
+  }
+}

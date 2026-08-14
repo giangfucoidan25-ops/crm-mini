@@ -1,0 +1,14 @@
+async recalculateCustomerStats(customerId) {
+        const orders = await this.getOrdersByCustomer(customerId);
+        let total_orders = orders.length;
+        let total_revenue = 0;
+        let last_order_date = null;
+        let last_product_used = null;
+        let estimated_product_end_date = null;
+        let last_completed_order_date = null;
+        let product_expiries = null;
+
+        const sortedOrders = [...orders].sort((a, b) => {
+            if (a.order_date !== b.order_date) {
+                return a.order_date > b.order_date ? -1 : 1;
+            }

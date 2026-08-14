@@ -1,0 +1,42 @@
+[
+  {
+    "id": 128,
+    "customer_id": 118,
+    "product_id": 1,
+    "product_name": "Nutri Nano Fucoidan",
+    "order_date": "2026-05-28",
+    "quantity": 14,
+    "unit_price": 630000,
+    "discount": 0,
+    "total_amount": 5190000,
+    "order_status": "completed",
+    "estimated_product_end_date": "2026-10-05",
+    "cancel_reason": "",
+    "note": "Imported from Feb Excel Sheet",
+    "created_at": "2026-06-28T00:02:25.259556Z",
+    "updated_at": "2026-07-02T09:19:50.950Z",
+    "items": [
+      {
+        "product_id": 1,
+        "product_name": "Nutri Nano Fucoidan",
+        "quantity": 8,
+        "unit_price": 630000,
+        "is_gift": false
+      },
+      {
+        "product_id": 1,
+        "product_name": "Nutri Nano Fucoidan",
+        "quantity": 5,
+        "unit_price": 0,
+        "is_gift": true
+      },
+      {
+        "product_id": 5,
+        "product_name": "Đường mía Hà Thủ ô",
+        "quantity": 1,
+        "unit_price": 150000,
+        "is_gift": false
+      }
+    ]
+  }
+]

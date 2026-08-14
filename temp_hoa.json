@@ -1,0 +1,19 @@
+[
+  {
+    "customer_id": 87,
+    "care_date": "2026-06-30",
+    "care_type": "Gọi điện",
+    "note": "Cô còn 1 hộp. Dùng hạn chế vì hết tài khoản rồi. Đã tư vấn lại cô chương trình ưu đãi. Cô quan tâm 6t3 + viên nang sâm. Gửi hình ảnh Viên nang sâm qua zalo cho cô",
+    "created_at": "2026-06-30T08:47:54.130Z",
+    "id": 531
+  },
+  {
+    "customer_id": 87,
+    "care_date": "2026-07-11",
+    "care_type": "Gọi điện",
+    "note": "CNM",
+    "is_remedy": false,
+    "created_at": "2026-07-11T07:44:08.330Z",
+    "id": 1339
+  }
+]

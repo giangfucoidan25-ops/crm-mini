@@ -1,0 +1,53 @@
+{
+  "customer": {
+    "id": 95,
+    "full_name": "Nguyễn Đình Đức",
+    "phone": "0762204966",
+    "zalo_phone": "0762204966",
+    "email": "",
+    "address": "Số 140, Châu Thôn 1, xã Yên Lạc, Yên Định, Thanh Hóa.",
+    "customer_source": "other",
+    "status": "purchased",
+    "tags": "",
+    "note": "2,520,000\nNhận\nNaT",
+    "last_contact_date": "2026-06-17",
+    "next_care_date": "2026-07-11",
+    "care_cycle_days": 30,
+    "created_at": "2026-06-27T22:39:57.267899Z",
+    "updated_at": "2026-07-04T04:11:26.469Z",
+    "total_revenue": 2520000,
+    "total_orders": 1,
+    "priority_score": 0,
+    "overdue_status": false,
+    "transferred_status": false,
+    "stopped_status": false,
+    "last_order_date": "2026-04-12",
+    "last_product_used": "Nutri Nano Fucoidan",
+    "keyword_category": "NONE",
+    "last_completed_order_date": "2026-04-12",
+    "getfly_url": "https://fucoidan2026.getflycrm.com/#/crm/view_account/238591",
+    "product_expiries": {
+      "Nutri Nano Fucoidan": "2027-02-02"
+    },
+    "estimated_product_end_date": "2027-02-02"
+  },
+  "orders": [
+    {
+      "id": 99,
+      "customer_id": 95,
+      "product_id": 1,
+      "product_name": "Nutri Nano Fucoidan",
+      "order_date": "2026-04-12",
+      "quantity": 6,
+      "unit_price": 2520000,
+      "discount": 0,
+      "total_amount": 2520000,
+      "order_status": "completed",
+      "estimated_product_end_date": "2027-02-02",
+      "cancel_reason": "",
+      "note": "Imported from Feb Excel Sheet",
+      "created_at": "2026-06-27T22:39:57.267899Z",
+      "updated_at": "2026-06-27T22:39:57.267899Z"
+    }
+  ]
+}

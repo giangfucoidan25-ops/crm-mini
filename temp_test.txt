@@ -1,0 +1,6 @@
+0	1	2	3	4	5	6	7	8	9
+	Tên sản phẩm	Ngày đặt hàng	Số điện thoại	Họ tên và địa chỉ	Tình trạng	Tổng tiền	Ghi chú	Ghi chú	Ghi chú
+		2026-05-31 00:00:00	0373916995	KH138854 - Vũ thị Hương Số nhà 33 đường trục chính, thôn hạ, chuyên mỹ ,Phú Xuyên Hà Nội	Nhận	3,750,000			
+		2026-05-31 00:00:00	0974571446	KH194062 - Nguyễn Tuyến thôn 6, xã Quảng Thịnh, huyện Hải Hà, tỉnh Quảng Ninh	Hoàn	1,890,000			
+		2026-05-31 00:00:00	0782107979	KH215802 - Loan Phun Xăm Chợ Hồng Thái Đông, thị xã Đông Triều, Quảng Ninh	Nhận	2,520,000			
+		2026-05-30 00:00:00	0989304712	KH175306 - Hoàng Bích Nga Chợ Con Phường Trại Cau, Quận Lê Chân, Thành phố Hải Phòng.	Nhận	2,520,000			15/6 Ngày 1-2 cốc. Buổi sáng sau ăn sáng và chiều muộn đói thì uống. Cô muốn tăng cân nên dùng sau ăn

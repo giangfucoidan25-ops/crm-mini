@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "product_name": "Nutri Nano Fucoidan",
+    "product_category": "other",
+    "price": 0,
+    "active_status": true,
+    "created_at": "2026-06-24T10:46:15.817155Z"
+  },
+  {
+    "id": 2,
+    "product_name": "Sản phẩm khác",
+    "product_category": "other",
+    "price": 0,
+    "active_status": true,
+    "created_at": "2026-06-24T10:46:15.817738Z"
+  },
+  {
+    "id": 3,
+    "product_name": "Ancan",
+    "product_category": "other",
+    "price": 0,
+    "active_status": true,
+    "created_at": "2026-06-24T10:46:15.820397Z"
+  }
+]

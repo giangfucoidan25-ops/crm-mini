@@ -1,0 +1,44 @@
+async scanOldDataKeywords() {
+        const useAi = await DB.getSetting('use_ai_keyword_filter');
+        const warningAi = useAi ? '\n\nCẢNH BÁO: Bạn đang Bật AI. Quá trình quét có thể mất rất nhiều thời gian (khoảng 2s/khách hàng) và có thể gặp lỗi nếu quá tải API.' : '';
+        const ok = await Utils.confirm(
+            'Quét dữ liệu cũ',
+            'Thao tác này sẽ quét toàn bộ ghi chú và lịch sử chăm sóc của tất cả khách hàng để phân loại Ưu tiên, Không ưu tiên, hoặc Tạm dừng.' + warningAi + ' Tiếp tục?',
+            '🔄'
+        );
+        if (!ok) return;
+
+        document.getElementById('loading-screen').classList.remove('hidden');
+        document.getElementById('loading-text').textContent = 'Đang quét dữ liệu...';
+
+        try {
+            const allCustomers = await DB.db.customers.toArray();
+            const allLogs = await DB.db.care_logs.toArray();
+            
+            const priorityKw = await DB.getSetting('priority_keywords') || [];
+            const nonPriorityKw = await DB.getSetting('non_priority_keywords') || [];
+            const stopKw = await DB.getSetting('stop_care_keywords') || [];
+            
+            let countStopped = 0;
+            let countPriority = 0;
+            let countNonPriority = 0;
+
+            for (const c of allCustomers) {
+                if (c.deleted_at) continue;
+                if (c.manual_stopped && c.stopped_status) continue;
+
+                // Bổ sung: Tính toán lại thống kê (kèm cơ chế gán trạng thái tự động)
+                await DB.recalculateCustomerStats(c.id);
+
+                let finalIntent = 'NONE';
+                
+                // Thu thập toàn bộ note của khách hàng này để phân tích
+                const logs = allLogs.filter(l => l.customer_id === c.id && l.note);
+                // Sắp xếp theo ngày tăng dần (từ cũ đến mới nhất)
+                logs.sort((a,b) => new Date(a.care_date) - new Date(b.care_date));
+
+                if (useAi) {
+                    let fullText = c.note ? `[Ghi chú ban đầu] ${c.note}` : '';
+                    logs.forEach(l => {
+                        fullText += `\n[${Utils.formatDate(l.care_date) || l.care_date}] ${l.note}`;
+                    }

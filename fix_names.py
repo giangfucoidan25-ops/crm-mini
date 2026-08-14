@@ -1,0 +1,57 @@
+import json
+
+with open('database.json', 'r', encoding='utf-8') as f:
+    db = json.load(f)
+
+fixes = {
+  1: ("Phạm Luyến", "ngõ 128, Phúc Hải, đường Đa Phúc, Dương Kinh, Hải Phòng"),
+  2: ("Nguyễn Thị Trinh", "Ấp 2, xã Sông Trầu, Trảng Bom, Đồng Nai"),
+  3: ("Nguyễn Thị Toan", "Phòng 203, tầng 2, Khu tập thể 19/3, thôn Quỳnh Đô, xã Đại Thanh, Tp. Hà Nội"),
+  4: ("Chị Tuyết Trần", "28 Ngô Quyền phường Tân An, Q. Ninh Kiều, thành phố Cần Thơ"),
+  5: ("Trần Thị Tâm", "Xóm 1, xã Viên Thành, huyện Yên Thành, Nghệ An"),
+  6: ("Nguyễn Văn Sài", "217/13/8, đường TL19, phường Thạnh Lộc, Quận 12, TP. HCM"),
+  7: ("Vũ Thị Thắm", "Bệnh viện K cơ sở 3 (K3) Số 30, đường Cầu Bươu, xã Tân Triều, huyện Thanh Trì, Thành phố Hà Nội"),
+  8: ("Loan Phun Xăm", "Chợ Hồng Thái Đông, thị xã Đông Triều, Quảng Ninh"),
+  9: ("Cô Võ Hiếu Hạnh", "Tổ 13, ấp Cây Nính, xã Phước Trạch, huyện Gò Dầu, tỉnh Tây Ninh"),
+  10: ("Nguyễn Đông", "Km 7, xã Cốc San, TP. Lào Cai (Cạnh Nhà Hàng Thắng Thắm)"),
+  11: ("Mai văn đoàn", "306/21 Tô Ngọc Vân ,Phường Thạnh Xuân ,Quận 12 ,HCM"),
+  12: ("Kim Quý", "(SĐT nhận hàng: 0962.703.775) 162 Nguyễn Văn Tuyết, phường Trung Liệt, quận Đống Đa, Hà Nội."),
+  13: ("Lê Thị Định", "Xóm chợ Đụn, xã Yên Đức, Đông Triều, Quảng Ninh"),
+  14: ("Nguyễn Văn Tân", "Xóm Đông, Khánh Hòa, Yên Khánh, Ninh Bình"),
+  15: ("Đoàn Thị Tám", "số nhà 37, Đường Trần Quang Hiệu, Phường Quang Trung, Thành Phố Thái Bình"),
+  16: ("Phạm Thu", "Thôn Uất Lũy ,Xã Điện Minh ,Thị Xã Điện Bàn ,Tỉnh Quảng Nam"),
+  17: ("Đặng Nga", "Khu 4, Ngõ 46, Đường Ngô Quyền, Quảng Yên, Quảng Ninh"),
+  18: ("Ngọc Thúy", "318 A, Ấp Đức Hạnh 2, xã Đức Lập Hạ, Đức Hòa, Long An."),
+  19: ("Chú Cao Thanh Nghị", "364, đường Dã Tượng, Phường Phước Long, TP.Nha Trang, Khánh Hòa"),
+  20: ("Nguyệt Nguyệt", "Ấp Yên Quý, xã Nam Yên, huyện An Biên, Kiên Giang"),
+  21: ("Cô Phương Phạm", "Tháp 4, chung cư The Sun Avenue, Số 28, đường Mai Chí Thọ, Phường An Phú, Quận 2, Thành phố Hồ Chí Minh"),
+  22: ("Ngô Thị Nga", ""),
+  23: ("Phi Tran", "84 Y, khu Phố Long Phượng, Thị Trấn Long Điền, huyện Long Điền, Bà Rịa Vũng Tàu."),
+  24: ("Nguyễn Thành", "Toà N03 ECOHOM3 Đường Tân Xuân P. Đông Ngạc Q. Bắc Từ Liêm Hà Nội"),
+  25: ("Ngọc Hân", "Bệnh Viện Sản Nhi Vĩnh Phúc - Km số 9, đường tránh Vĩnh Yên, xã Đồng Văn, huyện Yên Lạc, tỉnh Vĩnh Phúc"),
+  26: ("Nguyên Ngô Hoàng", "(Sđt Nhận hàng chị Kim Đẹp - 0918324465) Bệnh Viện 175, khoa Ung bướu, 786 Nguyễn Kiệm, Phường 3 Gò Vấp, TP. HCM"),
+  27: ("Lan Anh", "2/101 Lê Huân, Phường Thuận Hòa, Q. Phú Xuân, Tp. Huế."),
+  28: ("Nguyen Dung", "Số 4, BT9, Phố Cửa Quán, Khu Đô Thị Văn Phú, Hà Đông, Hà Nội."),
+  29: ("Thanh Dung", "số 112/13, Khu Phố chợ, Thuận An Bình Dương"),
+  30: ("Hạ Hải", "Thôn Nghiêm Thôn, thị trấn Phố Mới, Quế Võ, Bắc Ninh"),
+  31: ("Đinh Thị Mơ", "Gần cổng Ủy Ban, xã Tân Lãng, huyện Lương Tài, Bắc Ninh")
+}
+
+for c in db['customers']:
+    cid = c['id']
+    if cid in fixes:
+        c['full_name'] = fixes[cid][0]
+        c['address'] = fixes[cid][1]
+        
+        # Special case for ID 22 note
+        if cid == 22:
+            extra_note = "mua 27/11, Chị Hằng con gái tái 7t4 ngày  9/1"
+            if c.get('note'):
+                c['note'] = extra_note + "\n" + c['note']
+            else:
+                c['note'] = extra_note
+
+with open('database.json', 'w', encoding='utf-8') as f:
+    json.dump(db, f, ensure_ascii=False, indent=4)
+    
+print("Updated customers full names and addresses!")
