@@ -120,6 +120,7 @@ const CareModule = {
             return st.status === 'overdue' || st.status === 'never';
         });
         const productIssues = customers.filter(c => {
+            if (c.transferred_status) return false;
             if (!c.estimated_product_end_date) return false;
             if (c.hibernated_until && c.hibernated_until >= today) return false;
             return Utils.daysFromNow(c.estimated_product_end_date) <= 7;
@@ -127,7 +128,7 @@ const CareModule = {
 
         const stats = await DB.getStats();
         const scored = AiAnalysisModule.calculatePriorityScores(customers, stats);
-        const special = scored.filter(c => c._priorityScore > 0);
+        const special = scored.filter(c => !c.transferred_status && c._priorityScore > 0);
 
         const allAppointments = await DB.db.appointments.filter(a => a.status === 'pending').toArray();
         const appointmentCustomerIds = new Set(allAppointments.map(a => a.customer_id));
@@ -139,7 +140,7 @@ const CareModule = {
             appointmentsDict[a.customer_id].push(a);
         });
         
-        const appointmentCustomers = customers.filter(c => appointmentCustomerIds.has(c.id)).map(c => {
+        const appointmentCustomers = customers.filter(c => !c.transferred_status && appointmentCustomerIds.has(c.id)).map(c => {
             c._appointments = appointmentsDict[c.id].sort((a,b) => new Date(a.appointment_date) - new Date(b.appointment_date));
             return c;
         });
