@@ -615,7 +615,7 @@ const Utils = {
     },
 
     async analyzeKeywordIntentAI(text, apiKey, priorityKw, nonPriorityKw, stopKw, cancelKw) {
-        let targetModel = 'gemini-1.5-flash';
+        let targetModel = 'gemini-3.7-flash';
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`;
 
         const prompt = `Bạn là hệ thống phân loại khách hàng CRM.

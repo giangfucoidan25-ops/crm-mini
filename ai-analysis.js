@@ -266,7 +266,7 @@ ${JSON.stringify(dataToExport, null, 2)}`;
                 generationConfig: { temperature: 0.7, maxOutputTokens: 65536 }
             };
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${apiKey}`;
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
