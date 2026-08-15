@@ -172,7 +172,7 @@ Hãy LOẠI BỎ khách tiêu cực, sau đó áp dụng logic trên để chọ
 
 ## ĐỊNH DẠNG MỖI KHÁCH HÀNG (BẮT BUỘC TRÌNH BÀY ĐÚNG MẪU NÀY):
 
-**[STT]. [Emoji] [Tên] — [SĐT]** [ID:{id}]
+**[STT]. [Emoji] [Tên] — [SĐT]** [ID:{id}] [URL:{getfly_url}]
 - **Tình hình:** (2-3 câu tóm tắt từ lịch sử chăm sóc: khách nói gì, phản hồi ra sao)
 - **Lý do chăm sóc:** (sản phẩm hết ngày nào, quá hạn bao lâu, v.v.)
 - **Hành động:** 
@@ -181,6 +181,7 @@ Hãy LOẠI BỎ khách tiêu cực, sau đó áp dụng logic trên để chọ
 
 *Lưu ý:* 
 - *[Emoji] là đánh giá thái độ: 🟢 (Tích cực) hoặc 🟡 (Trung lập).*
+- *Nếu khách hàng không có trường getfly_url, hãy để trống phần [URL: ]*
 - *KHÔNG viết riêng một dòng "Thái độ" như trước.*
 
 ---

@@ -233,10 +233,21 @@ Chỉ xuất định dạng JSON, không có bất kỳ văn bản nào nằm ng
             .replace(/^# (.+)$/gm, '<h2 class="covan-h2">$1</h2>')
             // Horizontal rules
             .replace(/^---+$/gm, '<hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">')
-            // ID link parsing
-            .replace(/\[ID:\s*(\d+)\]/gi, '<a href="?customer_id=$1" target="_blank" class="btn-link" style="margin-left:8px; font-size:0.9em; text-decoration:none; padding:2px 8px; background:rgba(var(--color-primary-rgb), 0.1); color:var(--color-primary); border-radius:12px; border:1px solid rgba(var(--color-primary-rgb), 0.3);" title="Mở hồ sơ khách hàng ở tab mới">🔗 Xem HS</a>')
-            // Customer Title with double spacing
-            .replace(/^\*\*(\d+\..+?)\*\*(.*)$/gm, '<div style="margin-top: 24px; margin-bottom: 4px; font-size: 1.05em;"><strong>$1</strong>$2</div>')
+            // Customer Title and Links parsing
+            .replace(/^\*\*(\d+\..+?)\*\*(.*)$/gm, (match, namePart, rest) => {
+                let idMatch = rest.match(/\[ID:\s*(\d+)\]/i);
+                let urlMatch = rest.match(/\[URL:\s*(.+?)\]/i);
+                let id = idMatch ? idMatch[1] : '';
+                let url = urlMatch ? urlMatch[1].trim() : '';
+                if (url === 'none' || url === ']' || url === '') url = null;
+                let cleanRest = rest.replace(/\[ID:\s*\d+\]/gi, '').replace(/\[URL:\s*.*?\]/gi, '').trim();
+                let titleHtml = id ? `<a href="?customer_id=${id}" target="_blank" style="text-decoration:none; color:inherit;" title="Xem chi tiết trên hệ thống"><strong>${namePart}</strong></a>` : `<strong>${namePart}</strong>`;
+                let linkHtml = (url && url.length > 5) ? `<a href="${url}" target="_blank" class="btn-link" style="margin-left:8px; font-size:0.9em; text-decoration:none; padding:2px 8px; background:rgba(var(--color-primary-rgb), 0.1); color:var(--color-primary); border-radius:12px; border:1px solid rgba(var(--color-primary-rgb), 0.3);" title="Mở hồ sơ trên hệ thống ngoài">🔗 Xem HS</a>` : '';
+                return `<div style="margin-top: 24px; margin-bottom: 4px; font-size: 1.05em;">${titleHtml}${linkHtml} ${cleanRest}</div>`;
+            })
+            // Xóa các thẻ [ID] hoặc [URL] nếu bị rớt xuống dòng khác
+            .replace(/\[ID:\s*\d+\]/gi, '')
+            .replace(/\[URL:\s*.*?\]/gi, '')
             // Inline code
             .replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.1); padding:1px 5px; border-radius:3px; font-size:0.9em;">$1</code>')
             // Bold
