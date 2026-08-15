@@ -79,7 +79,10 @@ const OrdersModule = {
                         ${cust ? `<strong style="cursor:pointer;" onclick="CustomersModule.viewCustomer(${cust.id})">${Utils.escapeHtml(cust.full_name)}</strong>` : 'N/A'}
                         ${Utils.getGetFlyLink(cust)}
                     </td>
-                    <td>${Utils.escapeHtml(o.product_name || '')}</td>
+                    <td>
+                        ${Utils.escapeHtml(o.product_name || '')}
+                        ${o.note ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">📝 ${Utils.escapeHtml(o.note)}</div>` : ''}
+                    </td>
                     <td>${o.quantity || 0}</td>
                     <td style="font-weight:600;">${Utils.formatCurrency(o.total_amount)}</td>
                     <td><span class="status-badge order-${o.order_status}">${Utils.orderStatusLabel(o.order_status)}</span></td>
@@ -119,7 +122,10 @@ const OrdersModule = {
             o.items.forEach(item => {
                 if (!item.is_gift) {
                     const matchedProduct = this.productsList.find(p => p.id === item.product_id || p.product_name === item.product_name);
-                    if (matchedProduct) item.unit_price = matchedProduct.price;
+                    if (matchedProduct) {
+                        item.unit_price = matchedProduct.price;
+                        item.product_id = matchedProduct.id;
+                    }
 
                     let split = false;
                     if (matchedProduct) {
@@ -146,6 +152,7 @@ const OrdersModule = {
                 }
             });
         } else {
+            let trueProductId = o.product_id;
             let trueUnitPrice = o.unit_price;
             let buyQty = o.quantity;
             let getQty = 0;
@@ -153,6 +160,7 @@ const OrdersModule = {
             if (isEdit) {
                 const matchedProduct = this.productsList.find(p => p.id === o.product_id || p.product_name === o.product_name);
                 if (matchedProduct) {
+                    trueProductId = matchedProduct.id;
                     trueUnitPrice = matchedProduct.price;
                     let pKey = null;
                     const pName = matchedProduct.product_name.toLowerCase();
@@ -173,7 +181,8 @@ const OrdersModule = {
             }
 
             itemsHtml = this.generateItemRowHtml(isEdit ? {
-                product_id: o.product_id,
+                product_id: trueProductId,
+                product_name: o.product_name,
                 quantity: buyQty,
                 unit_price: trueUnitPrice,
                 is_gift: false
@@ -181,7 +190,8 @@ const OrdersModule = {
             
             if (getQty > 0) {
                 itemsHtml += this.generateItemRowHtml({
-                    product_id: o.product_id,
+                    product_id: trueProductId,
+                    product_name: o.product_name,
                     quantity: getQty,
                     unit_price: 0,
                     is_gift: true
@@ -265,7 +275,7 @@ const OrdersModule = {
             <div class="form-group" style="flex: 4; min-width: 150px; margin-bottom: 0;">
                 <select class="select-filter item-product" style="width:100%; border: none; background: transparent; font-weight: 500; padding: 8px 0; font-size: 14px;" onchange="OrdersModule.onItemChange(${idx})">
                     <option value="">-- Chọn SP --</option>
-                    ${this.productsList.map(p => `<option value="${p.id}" data-price="${p.price}" data-cycle="${p.usage_cycle_days}" ${item.product_id == p.id ? 'selected' : ''}>${Utils.escapeHtml(p.product_name)}</option>`).join('')}
+                    ${this.productsList.map(p => `<option value="${p.id}" data-price="${p.price}" data-cycle="${p.usage_cycle_days}" ${(item.product_id == p.id || (!item.product_id && item.product_name === p.product_name)) ? 'selected' : ''}>${Utils.escapeHtml(p.product_name)}</option>`).join('')}
                 </select>
             </div>
             <div class="form-group" style="flex: 1; min-width: 90px; margin-bottom: 0; display: flex; justify-content: center;">

@@ -380,7 +380,7 @@ const CustomersModule = {
                             </div>
                             <div class="cd-info-row" style="flex-direction:column;align-items:flex-start;margin-bottom:8px;">
                                 <span class="label" style="font-weight:600;">Nhóm khách hàng:</span>
-                                <span>${Utils.customerStatusLabel(c.status)}</span>
+                                <span>${Utils.customerStatusLabel(c.status)} ${c.transferred_status ? '<span class="badge badge-purple" style="margin-left:8px;">Đã chuyển</span>' : ''}</span>
                             </div>
                             ${c.special_note ? `
                             <div class="cd-info-row" style="flex-direction:column;align-items:flex-start;margin-bottom:8px;background:rgba(255,193,7,0.1);padding:8px;border-radius:4px;border-left:3px solid var(--color-warning);">
@@ -570,6 +570,7 @@ const CustomersModule = {
                                         <span>${o.product_name} (x${o.quantity || 1})</span>
                                         <strong style="color:var(--color-success);">${Utils.formatCurrency(o.total_amount)}</strong>
                                     </div>
+                                    ${o.note ? `<div style="margin-top: 8px; font-size: 13px; color: var(--text-muted); background: var(--bg-tertiary); padding: 8px; border-radius: 6px;">📝 ${Utils.escapeHtml(o.note).replace(/\n/g, '<br>')}</div>` : ''}
                                 </div>
                             </div>
                         `).join('') : '<p class="empty-state">Chưa có đơn hàng</p>'}
@@ -766,7 +767,7 @@ CẢNH BÁO CHÚ Ý:
                     generationConfig: { responseMimeType: "application/json" }
                 };
 
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

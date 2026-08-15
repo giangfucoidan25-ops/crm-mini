@@ -512,6 +512,10 @@ const Utils = {
     },
 
     getCareStatus(customer, config = { cycle: 30 }) {
+        if (customer.transferred_status) {
+            return { status: 'transferred', label: 'Khách đã chuyển', class: 'badge-purple', overdue: false, tooltip: 'Khách hàng này đã được chuyển đi, không nằm trong danh sách CS' };
+        }
+
         const lastOrder = customer.last_completed_order_date;
         const lastContact = customer.last_contact_date;
         const note = customer.note || "";
@@ -611,7 +615,7 @@ const Utils = {
     },
 
     async analyzeKeywordIntentAI(text, apiKey, priorityKw, nonPriorityKw, stopKw, cancelKw) {
-        let targetModel = 'gemini-1.5-flash';
+        let targetModel = 'gemini-3.7-flash';
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`;
 
         const prompt = `Bạn là hệ thống phân loại khách hàng CRM.
