@@ -232,7 +232,8 @@ const SupabaseSync = {
             if(topStatus) topStatus.innerHTML = '<span title="Đã đồng bộ an toàn" style="color:var(--color-success);">☁️ Đã lưu mây</span>';
         } catch (e) {
             console.error(`Lỗi đồng bộ lên ${tableName}:`, e);
-            Utils.showToast('Lỗi đồng bộ đám mây!', 'error');
+            const errMsg = e.message || e.details || 'Lỗi không xác định';
+            Utils.showToast(`Lỗi đồng bộ đám mây: ${errMsg}`, 'error');
             const topStatus = document.getElementById('topbar-sync-status');
             if(topStatus) topStatus.innerHTML = '<span title="Lỗi đồng bộ" style="color:var(--color-danger);">☁️ Lỗi</span>';
         }
