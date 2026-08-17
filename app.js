@@ -5,12 +5,15 @@
 
 const App = {
     currentPage: 'dashboard',
+    isInitialized: false,
 
     async init() {
         try {
             // 1. Chờ khởi tạo Database
             document.getElementById('loading-text').textContent = 'Khởi tạo cơ sở dữ liệu...';
-            await DB.init();
+            if (!DB.db) {
+                await DB.init();
+            }
 
             // Force reload from cloud ONCE to fix Dexie cache
             const forcedSync = localStorage.getItem('force_sync_v3');
@@ -377,6 +380,7 @@ Quang Đức - 19/03/2026 11:43`;
                 const appEl = document.getElementById('app');
                 if (appEl) appEl.style.display = 'flex';
                 document.getElementById('loading-screen').classList.add('hidden');
+                App.isInitialized = true;
             }, 500);
 
         } catch (err) {
@@ -582,6 +586,15 @@ Quang Đức - 19/03/2026 11:43`;
 };
 
 // Khởi chạy ứng dụng khi DOM tải xong
-document.addEventListener('DOMContentLoaded', () => {
-    App.init();
+document.addEventListener('DOMContentLoaded', async () => {
+    // Luôn khởi tạo DB trước để tránh lỗi null
+    if (typeof DB !== 'undefined' && !DB.db) {
+        await DB.init();
+    }
+    
+    if (typeof SupabaseSync !== 'undefined') {
+        await SupabaseSync.init();
+    } else {
+        App.init();
+    }
 });

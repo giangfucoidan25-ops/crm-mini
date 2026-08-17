@@ -39,8 +39,32 @@ const DB = {
         // Khởi tạo settings mặc định
         await this.initDefaultSettings();
 
-        // Tự động đồng bộ từ server Google Drive
-        await this.syncFromServer();
+        // Tự động đồng bộ từ server Google Drive (CŨ)
+        // await this.syncFromServer();
+        
+        // Đăng ký Dexie Hooks để đẩy dữ liệu lên Supabase tự động
+        const tablesToSync = ['customers', 'products', 'orders', 'care_logs', 'appointments', 'message_templates'];
+        tablesToSync.forEach(table => {
+            this.db[table].hook('creating', function(primKey, obj, trans) {
+                if(typeof SupabaseSync !== 'undefined' && SupabaseSync.isConnected && !SupabaseSync.isSyncing) {
+                    // Dexie auto-increments don't mutate obj immediately, we must append the key
+                    const pushObj = { ...obj, id: primKey };
+                    // Đẩy qua hàng đợi hoặc dùng setTimeout để không làm gián đoạn UI
+                    setTimeout(() => SupabaseSync.push(table, pushObj), 100);
+                }
+            });
+            this.db[table].hook('updating', function(mods, primKey, obj, trans) {
+                if(typeof SupabaseSync !== 'undefined' && SupabaseSync.isConnected && !SupabaseSync.isSyncing) {
+                    const fullObj = { ...obj, ...mods, id: primKey };
+                    setTimeout(() => SupabaseSync.push(table, fullObj), 100);
+                }
+            });
+            this.db[table].hook('deleting', function(primKey, obj, trans) {
+                if(typeof SupabaseSync !== 'undefined' && SupabaseSync.isConnected && !SupabaseSync.isSyncing) {
+                    setTimeout(() => SupabaseSync.remove(table, primKey), 100);
+                }
+            });
+        });
         await this.fixSwappedDates();
         await this.fixMissingTotalAmounts();
         await this.fixCustomerStats();
@@ -917,12 +941,7 @@ const DB = {
     _syncLock: Promise.resolve(),
 
     async saveToServer(isUnloading = false) {
-        // Disabled: Legacy local server sync has been replaced by Google Drive Sync (DriveSyncModule).
-        // The DriveSyncModule automatically detects local changes and merges them with the cloud
-        // using the updated_at timestamps, so we no longer need to strictly block the UI with 409 errors.
-        if (typeof DriveSyncModule !== 'undefined' && DriveSyncModule.isConnected) {
-            DriveSyncModule.triggerAutoSync();
-        }
+        // Disabled: Cũ
     },
 
     async fixCompletedOrderDates() {
