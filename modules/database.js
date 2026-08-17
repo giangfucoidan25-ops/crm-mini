@@ -47,10 +47,10 @@ const DB = {
         tablesToSync.forEach(table => {
             this.db[table].hook('creating', function(primKey, obj, trans) {
                 if(typeof SupabaseSync !== 'undefined' && SupabaseSync.isConnected && !SupabaseSync.isSyncing) {
-                    // Dexie auto-increments don't mutate obj immediately, we must append the key
-                    const pushObj = { ...obj, id: primKey };
-                    // Đẩy qua hàng đợi hoặc dùng setTimeout để không làm gián đoạn UI
-                    setTimeout(() => SupabaseSync.push(table, pushObj), 100);
+                    this.onsuccess = function (realPrimKey) {
+                        const pushObj = { ...obj, id: realPrimKey };
+                        setTimeout(() => SupabaseSync.push(table, pushObj), 100);
+                    };
                 }
             });
             this.db[table].hook('updating', function(mods, primKey, obj, trans) {
