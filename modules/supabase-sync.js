@@ -225,7 +225,16 @@ const SupabaseSync = {
             const topStatus = document.getElementById('topbar-sync-status');
             if(topStatus) topStatus.innerHTML = '<span title="Đang đồng bộ lên đám mây..." style="color:var(--color-warning); animation: pulse 1s infinite alternate;">☁️ Đang lưu...</span>';
 
-            const { error } = await this.client.from(tableName).upsert(dataObj);
+            // SANITIZE: Xóa tất cả các key có chứa dấu chấm (do Dexie hoặc lỗi cũ để lại)
+            // PostgREST sẽ báo lỗi nếu có key chứa dấu chấm ở root level.
+            const cleanData = { ...dataObj };
+            for (const key in cleanData) {
+                if (key.includes('.')) {
+                    delete cleanData[key];
+                }
+            }
+
+            const { error } = await this.client.from(tableName).upsert(cleanData);
             
             if (error) throw error;
 
@@ -233,7 +242,14 @@ const SupabaseSync = {
         } catch (e) {
             console.error(`Lỗi đồng bộ lên ${tableName}:`, e);
             const errMsg = e.message || e.details || 'Lỗi không xác định';
-            Utils.showToast(`Lỗi đồng bộ đám mây: ${errMsg}`, 'error');
+            
+            // DEBUG CHUYÊN GIA: Hiển thị popup chi tiết chính xác dữ liệu nào gây lỗi
+            if (errMsg.includes('Could not find the') || errMsg.includes('column')) {
+                alert(`[DEBUG CHUYÊN GIA]\nLỗi Supabase khi lưu bảng ${tableName}:\n${errMsg}\n\nDữ liệu đang cố gửi:\n${JSON.stringify(cleanData, null, 2)}\n\nHãy chụp ảnh màn hình bảng này gửi cho AI!`);
+            } else {
+                Utils.showToast(`Lỗi đồng bộ đám mây: ${errMsg}`, 'error');
+            }
+            
             const topStatus = document.getElementById('topbar-sync-status');
             if(topStatus) topStatus.innerHTML = '<span title="Lỗi đồng bộ" style="color:var(--color-danger);">☁️ Lỗi</span>';
         }

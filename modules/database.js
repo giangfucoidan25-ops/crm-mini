@@ -55,8 +55,16 @@ const DB = {
             });
             this.db[table].hook('updating', function(mods, primKey, obj, trans) {
                 if(typeof SupabaseSync !== 'undefined' && SupabaseSync.isConnected && !SupabaseSync.isSyncing) {
-                    const fullObj = { ...obj, ...mods, id: primKey };
-                    setTimeout(() => SupabaseSync.push(table, fullObj), 100);
+                    setTimeout(async () => {
+                        try {
+                            const latestObj = await DB.db[table].get(primKey);
+                            if (latestObj) {
+                                SupabaseSync.push(table, latestObj);
+                            }
+                        } catch(e) {
+                            console.error('Lỗi lấy dữ liệu sau khi update:', e);
+                        }
+                    }, 100);
                 }
             });
             this.db[table].hook('deleting', function(primKey, obj, trans) {

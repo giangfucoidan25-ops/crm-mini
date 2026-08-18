@@ -105,3 +105,6 @@ ALTER TABLE appointments ADD COLUMN IF NOT EXISTS status text;
 ALTER TABLE appointments ADD COLUMN IF NOT EXISTS created_at timestamptz;
 ALTER TABLE appointments ADD COLUMN IF NOT EXISTS updated_at timestamptz;
 ALTER TABLE appointments ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS transferred_reason text;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS transferred_date date;
+NOTIFY pgrst, 'reload schema';

@@ -3,7 +3,7 @@
    Quản lý danh sách Khách hàng bị chuyển
    =================================================================== */
 
-const TransferredModule = {
+window.TransferredModule = {
     currentPage: 1,
     itemsPerPage: 20,
     customers: [],
@@ -76,7 +76,6 @@ const TransferredModule = {
                     </div>
                 </td>
             </tr>
-        `).join('');
         `).join('');
 
         const totalPages = Math.ceil(filteredCustomers.length / this.itemsPerPage) || 1;
