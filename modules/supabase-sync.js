@@ -264,7 +264,49 @@ const SupabaseSync = {
         }
     },
 
-    updateTopbarUI() {
+    async forcePushDatabaseJson() {
+        if (!confirm('Bạn có chắc chắn muốn đẩy dữ liệu từ database.json lên Supabase? Quá trình này sẽ mất một lúc.')) return;
+        
+        try {
+            Utils.showToast('Đang đọc database.json...', 'info');
+            const response = await fetch('./database.json?t=' + new Date().getTime());
+            const db = await response.json();
+            
+            const tables = ['customers', 'products', 'orders', 'care_logs', 'appointments'];
+            
+            for (const table of tables) {
+                if (db[table] && db[table].length > 0) {
+                    Utils.showToast(`Đang đẩy ${db[table].length} bản ghi lên bảng ${table}...`, 'info');
+                    
+                    for (let i = 0; i < db[table].length; i += 100) {
+                        const batch = db[table].slice(i, i + 100);
+                        const cleanBatch = batch.map(dataObj => {
+                            const cleanData = { ...dataObj };
+                            for (const key in cleanData) {
+                                if (key.includes('.')) delete cleanData[key];
+                            }
+                            return cleanData;
+                        });
+                        
+                        const { error } = await this.client.from(table).upsert(cleanBatch);
+                        if (error) {
+                            console.error(`Error pushing to ${table}:`, error);
+                            Utils.showToast(`Lỗi khi đẩy bảng ${table}: ${error.message}`, 'error');
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            Utils.showToast('Đã đẩy toàn bộ dữ liệu thành công! Đang tải lại...', 'success', 3000);
+            setTimeout(() => window.location.reload(), 2000);
+        } catch (err) {
+            console.error('Lỗi khi đẩy dữ liệu:', err);
+            Utils.showToast('Lỗi: ' + err.message, 'error');
+        }
+    },
+
+    updateSyncStatus(status) {
         const topStatus = document.getElementById('topbar-sync-status');
         if (topStatus) {
             topStatus.innerHTML = '<span title="Đã kết nối Supabase" style="color:var(--color-success);">☁️ Đã lưu mây</span>';

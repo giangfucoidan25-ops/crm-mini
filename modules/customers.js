@@ -67,7 +67,7 @@ const CustomersModule = {
                     customerIdsWithProduct.add(o.customer_id);
                 }
             });
-            customers = customers.filter(c => customerIdsWithProduct.has(c.id));
+            customers = customers.filter(c => customerIdsWithProduct.has(c.id) || customerIdsWithProduct.has(String(c.id)) || customerIdsWithProduct.has(Number(c.id)));
         }
 
         if (careFilter) {
@@ -124,7 +124,7 @@ const CustomersModule = {
                 }).toArray();
                 const orderedCustIds = new Set(ordersInRange.map(o => o.customer_id));
                 
-                customers = customers.filter(c => orderedCustIds.has(c.id));
+                customers = customers.filter(c => orderedCustIds.has(c.id) || orderedCustIds.has(String(c.id)) || orderedCustIds.has(Number(c.id)));
             }
         }
 
@@ -551,7 +551,19 @@ const CustomersModule = {
                                         <div class="cd-log-text" style="margin-top:6px;">${Utils.escapeHtml(contentText).replace(/\n/g, '<br>')}</div>
                                     </div>
                                 </div>
-                            `}).join('') : '<p class="empty-state">Chưa có lịch sử trao đổi</p>'}
+                            `}).join('') : ''}
+                            ${c.note ? `
+                            <div class="cd-log-card" style="background-color: var(--bg-tertiary); border-left: 3px solid var(--color-warning);">
+                                <div class="cd-log-content">
+                                    <div class="cd-log-header">
+                                        <span class="cd-log-name" style="font-weight:700; font-size:14.5px; color:var(--text-primary);">Ghi chú hệ thống (Cũ)</span>
+                                        <span class="badge badge-warning" style="margin-left:8px;font-size:10px;">Ghi chú chung</span>
+                                    </div>
+                                    <div class="cd-log-text" style="margin-top:6px; white-space: pre-wrap; font-size:13.5px;">${Utils.escapeHtml(c.note)}</div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${(careLogs.length === 0 && !c.note) ? '<p class="empty-state">Chưa có lịch sử trao đổi</p>' : ''}
                         </div>
                     </div>
 

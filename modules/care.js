@@ -43,6 +43,7 @@ const CareModule = {
         for (const c of customers) {
             c._isRecentCNM = false;
             const log = logsByCustomer[c.id];
+            c._latestLog = log;
             if (log) {
                 const isMissedCall = /\b(cnm|knm|chưa nghe máy|không nghe máy)\b/i.test(log.note?.trim() || '');
                 if (isMissedCall && log.care_date >= twoDaysAgo) {
@@ -191,7 +192,7 @@ const CareModule = {
 
         const headerHtmlOnly = `
             <div style="font-weight:600; color:var(--text-main); font-size:15px; margin-bottom:10px; padding: 0 5px; display: flex; align-items: center;">
-                ${title}
+                ${title} (${list.length})
                 ${tab !== 'care-history' ? cnmSelectHtml : ''}
             </div>
         `;
@@ -313,6 +314,8 @@ const CareModule = {
                     <td><span class="badge ${careStatus.class}">${careStatus.label}</span></td>
                     <td>${expiryHtml}</td>
                     <td>
+                        ${c.note ? `<div style="font-size:12px; margin-bottom:4px; max-height:40px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;" title="${Utils.escapeHtml(c.note)}">📌 ${Utils.escapeHtml(c.note)}</div>` : ''}
+                        ${c._latestLog && c._latestLog.note ? `<div style="font-size:12px; color:var(--text-main); margin-bottom:4px; max-height:40px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;" title="${Utils.escapeHtml(c._latestLog.note)}">💬 ${Utils.escapeHtml(c._latestLog.note)}</div>` : ''}
                         ${c._priorityScore ? `<div class="care-item-score" style="margin-bottom:2px; display:inline-block;">${c._priorityScore}đ</div>` : ''}
                         ${c._reasons ? `<div class="care-item-reason" style="margin-bottom:2px; display:inline-block;">${c._reasons[0] || ''}</div>` : ''}
                         ${c._appointments ? `<div class="care-item-reason" style="background: var(--color-warning); color: #fff; padding: 2px 6px; border-radius: 4px; display:inline-block; font-size:11px;">📅 ${Utils.formatDateTime(c._appointments[0].appointment_date)}</div>` : ''}

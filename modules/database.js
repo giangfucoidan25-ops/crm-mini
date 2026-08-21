@@ -678,7 +678,7 @@ const DB = {
     },
 
     async getOrdersByCustomer(customerId) {
-        return await this.db.orders.filter(o => o.customer_id === customerId && !o.deleted_at).toArray();
+        return await this.db.orders.filter(o => o.customer_id == customerId && !o.deleted_at).toArray();
     },
 
     async getOrdersByDateRange(from, to) {
@@ -808,11 +808,11 @@ const DB = {
 
 
     async getCareLogsByCustomer(customerId) {
-        return await this.db.care_logs.filter(l => l.customer_id === customerId && !l.deleted_at).toArray().then(logs => {
+        return await this.db.care_logs.filter(l => l.customer_id == customerId && !l.deleted_at).toArray().then(logs => {
             return logs.sort((a, b) => {
                 const dateA = new Date(a.care_date).getTime();
                 const dateB = new Date(b.care_date).getTime();
-                if (dateA === dateB) {
+                if (dateA == dateB) {
                     return new Date(b.created_at || b.care_date).getTime() - new Date(a.created_at || a.care_date).getTime();
                 }
                 return dateB - dateA;
