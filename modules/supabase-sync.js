@@ -281,6 +281,25 @@ const SupabaseSync = {
                 appointments: ['id','customer_id','appointment_date','note','status','created_at']
             };
 
+            // Danh sách các trường kiểu ngày cần kiểm tra
+            const dateFields = ['care_date','created_at','updated_at','last_contact_date','next_care_date','last_order_date','last_completed_order_date','estimated_product_end_date','order_date','appointment_date'];
+            
+            // Hàm sửa ngày bị đảo tháng/ngày (vd: 2025-23-08 → 2025-08-23)
+            const fixDate = (val) => {
+                if (!val || typeof val !== 'string') return val;
+                const m = val.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                if (!m) return val;
+                let [, year, month, day] = m;
+                let mo = parseInt(month), dy = parseInt(day);
+                if (mo > 12 && dy <= 12) {
+                    // Tháng và ngày bị đảo, hoán đổi lại
+                    [mo, dy] = [dy, mo];
+                }
+                if (mo < 1 || mo > 12 || dy < 1 || dy > 31) return null; // Ngày không hợp lệ, bỏ qua
+                const fixed = `${year}-${String(mo).padStart(2,'0')}-${String(dy).padStart(2,'0')}`;
+                return val.replace(/^\d{4}-\d{2}-\d{2}/, fixed);
+            };
+
             const tables = ['customers', 'products', 'orders', 'care_logs', 'appointments'];
             
             for (const table of tables) {
@@ -294,7 +313,12 @@ const SupabaseSync = {
                             const cleanData = {};
                             for (const key of cols) {
                                 if (dataObj[key] !== undefined) {
-                                    cleanData[key] = dataObj[key];
+                                    let val = dataObj[key];
+                                    // Sửa ngày bị đảo cho các trường kiểu date
+                                    if (dateFields.includes(key) && typeof val === 'string') {
+                                        val = fixDate(val);
+                                    }
+                                    cleanData[key] = val;
                                 }
                             }
                             return cleanData;
