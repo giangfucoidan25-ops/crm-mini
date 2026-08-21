@@ -272,18 +272,30 @@ const SupabaseSync = {
             const response = await fetch('./database.json?t=' + new Date().getTime());
             const db = await response.json();
             
+            // Whitelist: chỉ giữ lại các cột có trong schema Supabase
+            const allowedColumns = {
+                customers: ['id','full_name','phone','zalo_phone','email','address','customer_source','status','tags','note','last_contact_date','next_care_date','care_cycle_days','created_at','updated_at','total_revenue','total_orders','priority_score','overdue_status','transferred_status','last_order_date','last_product_used','keyword_category','last_completed_order_date','getfly_url','stopped_status','estimated_product_end_date','special_note','product_expiries','recall_status','manual_stopped'],
+                products: ['id','product_name','product_category','price','unit_name','quantity_per_unit','unit_type','default_usage_per_day','inner_unit','dosage_per_day','usage_cycle_days','reorder_reminder_days','usage_instruction','description','note','updated_at'],
+                orders: ['id','customer_id','product_id','product_name','order_date','quantity','unit_price','discount','total_amount','order_status','estimated_product_end_date','cancel_reason','note','created_at','updated_at'],
+                care_logs: ['id','customer_id','care_date','care_type','note','created_at'],
+                appointments: ['id','customer_id','appointment_date','note','status','created_at']
+            };
+
             const tables = ['customers', 'products', 'orders', 'care_logs', 'appointments'];
             
             for (const table of tables) {
                 if (db[table] && db[table].length > 0) {
+                    const cols = allowedColumns[table];
                     Utils.showToast(`Đang đẩy ${db[table].length} bản ghi lên bảng ${table}...`, 'info');
                     
                     for (let i = 0; i < db[table].length; i += 100) {
                         const batch = db[table].slice(i, i + 100);
                         const cleanBatch = batch.map(dataObj => {
-                            const cleanData = { ...dataObj };
-                            for (const key in cleanData) {
-                                if (key.includes('.')) delete cleanData[key];
+                            const cleanData = {};
+                            for (const key of cols) {
+                                if (dataObj[key] !== undefined) {
+                                    cleanData[key] = dataObj[key];
+                                }
                             }
                             return cleanData;
                         });
@@ -295,10 +307,11 @@ const SupabaseSync = {
                             return;
                         }
                     }
+                    Utils.showToast(`✅ Đã đẩy xong bảng ${table} (${db[table].length} bản ghi)`, 'success');
                 }
             }
             
-            Utils.showToast('Đã đẩy toàn bộ dữ liệu thành công! Đang tải lại...', 'success', 3000);
+            Utils.showToast('🎉 Đã đẩy toàn bộ dữ liệu thành công! Đang tải lại...', 'success', 3000);
             setTimeout(() => window.location.reload(), 2000);
         } catch (err) {
             console.error('Lỗi khi đẩy dữ liệu:', err);
