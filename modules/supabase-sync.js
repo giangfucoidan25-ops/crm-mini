@@ -283,21 +283,43 @@ const SupabaseSync = {
 
             // Danh sách các trường kiểu ngày cần kiểm tra
             const dateFields = ['care_date','created_at','updated_at','last_contact_date','next_care_date','last_order_date','last_completed_order_date','estimated_product_end_date','order_date','appointment_date'];
+            // Danh sách các trường kiểu số
+            const numericFields = ['total_revenue','total_orders','priority_score','price','quantity','unit_price','discount','total_amount','quantity_per_unit','default_usage_per_day','usage_cycle_days','reorder_reminder_days','care_cycle_days'];
+            // Danh sách các trường kiểu boolean
+            const boolFields = ['overdue_status','transferred_status','stopped_status','recall_status','manual_stopped'];
             
             // Hàm sửa ngày bị đảo tháng/ngày (vd: 2025-23-08 → 2025-08-23)
+            // + chuyển chuỗi rỗng thành null
             const fixDate = (val) => {
-                if (!val || typeof val !== 'string') return val;
-                const m = val.match(/^(\d{4})-(\d{2})-(\d{2})/);
-                if (!m) return val;
+                if (val === null || val === undefined || val === '') return null;
+                if (typeof val !== 'string') return val;
+                const trimmed = val.trim();
+                if (trimmed === '' || trimmed === 'NaN' || trimmed === 'null' || trimmed === 'undefined') return null;
+                const m = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                if (!m) return null; // Không đúng format ngày → null
                 let [, year, month, day] = m;
                 let mo = parseInt(month), dy = parseInt(day);
                 if (mo > 12 && dy <= 12) {
-                    // Tháng và ngày bị đảo, hoán đổi lại
-                    [mo, dy] = [dy, mo];
+                    [mo, dy] = [dy, mo]; // Hoán đổi tháng/ngày
                 }
-                if (mo < 1 || mo > 12 || dy < 1 || dy > 31) return null; // Ngày không hợp lệ, bỏ qua
+                if (mo < 1 || mo > 12 || dy < 1 || dy > 31) return null;
                 const fixed = `${year}-${String(mo).padStart(2,'0')}-${String(dy).padStart(2,'0')}`;
-                return val.replace(/^\d{4}-\d{2}-\d{2}/, fixed);
+                return trimmed.replace(/^\d{4}-\d{2}-\d{2}/, fixed);
+            };
+            
+            // Hàm làm sạch giá trị theo kiểu dữ liệu
+            const sanitizeValue = (key, val) => {
+                if (dateFields.includes(key)) return fixDate(val);
+                if (numericFields.includes(key)) {
+                    if (val === '' || val === null || val === undefined || val === 'NaN') return null;
+                    const n = Number(val);
+                    return isNaN(n) ? null : n;
+                }
+                if (boolFields.includes(key)) {
+                    if (val === '' || val === null || val === undefined) return null;
+                    return !!val;
+                }
+                return val;
             };
 
             const tables = ['customers', 'products', 'orders', 'care_logs', 'appointments'];
@@ -313,12 +335,7 @@ const SupabaseSync = {
                             const cleanData = {};
                             for (const key of cols) {
                                 if (dataObj[key] !== undefined) {
-                                    let val = dataObj[key];
-                                    // Sửa ngày bị đảo cho các trường kiểu date
-                                    if (dateFields.includes(key) && typeof val === 'string') {
-                                        val = fixDate(val);
-                                    }
-                                    cleanData[key] = val;
+                                    cleanData[key] = sanitizeValue(key, dataObj[key]);
                                 }
                             }
                             return cleanData;
