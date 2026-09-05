@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "exported_at": "2026-09-05T12:02:07.202711Z",
+  "exported_at": "2026-09-05T12:05:01.777198Z",
   "customers": [
     {
       "id": 1,
@@ -20907,7 +20907,7 @@
     },
     {
       "key": "last_sync_timestamp",
-      "value": "2026-09-05T12:02:07.202711Z"
+      "value": "2026-09-05T12:05:01.777198Z"
     },
     {
       "key": "non_priority_keywords",
