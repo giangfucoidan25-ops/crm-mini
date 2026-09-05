@@ -55,6 +55,7 @@ except Exception as e:
     sys.exit(1)
 
 matched_count = 0
+added_customers = 0
 added_orders = 0
 updated_orders = 0
 added_logs = 0
@@ -68,9 +69,45 @@ for idx, row in df.iterrows():
     if not phone: continue
     
     customer = next((c for c in customers if c.get('phone') == phone or c.get('zalo_phone') == phone), None)
-    if not customer: continue
     
-    matched_count += 1
+    if not customer:
+        # TẠO KHÁCH HÀNG MỚI
+        raw_name = str(row.get('Link ẩn, Họ tên và địa chỉ', '')).strip()
+        full_name = raw_name
+        note = ""
+        
+        # Bóc tách mã KH nếu có
+        m = re.match(r'(KH\d+\s*-\s*)(.*)', raw_name)
+        if m:
+            note = f"Mã Excel: {m.group(1).strip('- ')}"
+            full_name = m.group(2).strip()
+            
+        customer = {
+            "id": get_next_id('customers'),
+            "full_name": full_name,
+            "phone": phone,
+            "zalo_phone": phone,
+            "email": "",
+            "address": "",
+            "customer_source": "import_excel",
+            "status": "new",
+            "tags": "",
+            "note": note,
+            "created_at": datetime.datetime.now(datetime.UTC).isoformat().replace('+00:00', 'Z'),
+            "updated_at": datetime.datetime.now(datetime.UTC).isoformat().replace('+00:00', 'Z'),
+            "total_revenue": 0,
+            "total_orders": 0,
+            "priority_score": 0,
+            "overdue_status": False,
+            "transferred_status": False,
+            "stopped_status": False,
+            "recall_status": False
+        }
+        db.setdefault('customers', []).append(customer)
+        customers = db['customers']
+        added_customers += 1
+    else:
+        matched_count += 1
     
     date_val = row.get('Ngày đặt hàng')
     if pd.isna(date_val): continue
@@ -133,6 +170,10 @@ for idx, row in df.iterrows():
         status_val = str(row.get('Tình trạng', '')).strip().lower()
         order_status = 'COMPLETED' if 'nhận' in status_val else 'DELIVERED'
 
+        # Cập nhật trạng thái khách hàng nếu cần
+        if customer.get('status') == 'new':
+            customer['status'] = 'purchased'
+
         # Tìm đơn hàng bị trùng để cập nhật
         existing_order = None
         for o in orders:
@@ -141,7 +182,6 @@ for idx, row in df.iterrows():
                 break
         
         if existing_order:
-            # Cập nhật đơn hàng
             existing_order['quantity'] = qty
             existing_order['total_amount'] = amount
             existing_order['items'] = items
@@ -212,6 +252,7 @@ for idx, row in df.iterrows():
                     added_logs += 1
 
 print(f"Matched Customers: {matched_count}")
+print(f"Added Customers: {added_customers}")
 print(f"Added Orders: {added_orders}")
 print(f"Updated Orders: {updated_orders}")
 print(f"Added Care Logs: {added_logs}")
