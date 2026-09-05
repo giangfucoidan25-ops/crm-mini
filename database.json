@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "exported_at": "2026-09-04T11:03:54.057274Z",
+  "exported_at": "2026-09-05T11:48:54.429097Z",
   "customers": [
     {
       "id": 1,
@@ -2257,8 +2257,8 @@
       "status": "purchased",
       "tags": "",
       "note": "Nhận\n4,410,000",
-      "last_contact_date": "2026-06-15",
-      "next_care_date": "2026-07-03",
+      "last_contact_date": "2026-08-04",
+      "next_care_date": "2026-09-01",
       "care_cycle_days": 30,
       "created_at": "2026-06-26T14:05:41.065736Z",
       "updated_at": "2026-08-04T06:55:00.351Z",
@@ -2805,8 +2805,8 @@
       "status": "purchased",
       "tags": "",
       "note": "2,520,000",
-      "last_contact_date": "2026-06-30",
-      "next_care_date": "2026-07-17",
+      "last_contact_date": "2026-08-12",
+      "next_care_date": "2026-08-16",
       "care_cycle_days": 30,
       "created_at": "2026-06-27T22:39:57.239592Z",
       "updated_at": "2026-08-04T06:55:00.927Z",
@@ -4237,8 +4237,8 @@
       "status": "purchased",
       "tags": "",
       "note": "ko có zalo\nCNM\n630",
-      "last_contact_date": "2026-07-14",
-      "next_care_date": "2026-07-18",
+      "last_contact_date": "2026-08-09",
+      "next_care_date": "2026-08-17",
       "care_cycle_days": 30,
       "created_at": "2026-06-28T00:02:25.298786Z",
       "updated_at": "2026-08-04T06:55:02.310Z",
@@ -4635,7 +4635,7 @@
       "total_revenue": 2520000,
       "total_orders": 1,
       "priority_score": 0,
-      "overdue_status": false,
+      "overdue_status": true,
       "transferred_status": false,
       "stopped_status": false,
       "last_order_date": "2026-05-07",
@@ -5146,8 +5146,8 @@
       "tags": "Đại lý",
       "care_cycle_days": 30,
       "note": "",
-      "last_contact_date": "2026-07-10",
-      "next_care_date": "2026-07-17",
+      "last_contact_date": "2026-08-11",
+      "next_care_date": "2026-08-18",
       "created_at": "2026-07-04T01:55:01.633Z",
       "updated_at": "2026-08-04T06:55:03.137Z",
       "total_revenue": 0,
@@ -19780,6 +19780,54 @@
       "is_remedy": false,
       "created_at": "2026-08-04T09:29:37.385Z",
       "id": 1638
+    },
+    {
+      "id": 1639,
+      "customer_id": 105,
+      "care_date": "2026-09-05",
+      "care_type": "Telesale",
+      "note": "5/9 CNM, đã gửi thông tin sp, cs qua zalo",
+      "created_at": "2026-09-05T11:48:54.251624Z"
+    },
+    {
+      "id": 1640,
+      "customer_id": 87,
+      "care_date": "2026-08-12",
+      "care_type": "Telesale",
+      "note": "12/8 Cô vẫn bình bình thế. Ngày 1-2 cốc, ngày nhớ ngày quên. Dùng nhiều nhanh hết. Còn 3 hộp. Đã tư vấn cô",
+      "created_at": "2026-09-05T11:48:54.252982Z"
+    },
+    {
+      "id": 1641,
+      "customer_id": 159,
+      "care_date": "2026-08-05",
+      "care_type": "Telesale",
+      "note": "5/8 Anh tưởng nó giống loại hộp chỉ là đóng vào gói. Gửi thêm thông tin Fu8 cho anh",
+      "created_at": "2026-09-05T11:48:54.254603Z"
+    },
+    {
+      "id": 1642,
+      "customer_id": 159,
+      "care_date": "2026-08-11",
+      "care_type": "Telesale",
+      "note": "11/8 Fu8 cao quá thôi em ạ. Thực dưỡng có ưu đãi gì không? Đã tư vấn anh. Gửi về địa chỉ nhà cho anh",
+      "created_at": "2026-09-05T11:48:54.255668Z"
+    },
+    {
+      "id": 1643,
+      "customer_id": 70,
+      "care_date": "2026-08-04",
+      "care_type": "Telesale",
+      "note": "4/8 Chị dùng đều, ngày 1-2 cốc. Chị ăn chay trường. Đã tư vấn chị dùng tăng cường buổi tối. chị dùng tới hộp thứ 4 rồi",
+      "created_at": "2026-09-05T11:48:54.259165Z"
+    },
+    {
+      "id": 1644,
+      "customer_id": 131,
+      "care_date": "2026-08-09",
+      "care_type": "Telesale",
+      "note": "9/8 tái 1 hộp",
+      "created_at": "2026-09-05T11:48:54.263403Z"
     }
   ],
   "message_templates": [
@@ -19891,7 +19939,7 @@
     },
     {
       "key": "last_sync_timestamp",
-      "value": "2026-09-04T11:03:54.057274Z"
+      "value": "2026-09-05T11:48:54.429097Z"
     },
     {
       "key": "non_priority_keywords",

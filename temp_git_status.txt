@@ -1,1 +1,3 @@
+ M database.json
+ M import_july_data.py
  M temp_git_status.txt
