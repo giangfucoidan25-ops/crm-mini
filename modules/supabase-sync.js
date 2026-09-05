@@ -177,7 +177,7 @@ const SupabaseSync = {
         if (typeof App !== 'undefined') {
             if (App.isInitialized) {
                 App.navigateTo(App.currentPage || 'dashboard', false);
-                this.updateTopbarUI();
+                if (typeof App.updateTopbarUI === 'function') App.updateTopbarUI();
             } else {
                 App.init();
             }
@@ -228,9 +228,14 @@ const SupabaseSync = {
             // SANITIZE: Xóa tất cả các key có chứa dấu chấm (do Dexie hoặc lỗi cũ để lại)
             // PostgREST sẽ báo lỗi nếu có key chứa dấu chấm ở root level.
             const cleanData = { ...dataObj };
+            const dateFields = ['care_date','created_at','updated_at','last_contact_date','next_care_date','last_order_date','last_completed_order_date','estimated_product_end_date','order_date','appointment_date'];
             for (const key in cleanData) {
                 if (key.includes('.')) {
                     delete cleanData[key];
+                } else if (dateFields.includes(key)) {
+                    if (cleanData[key] === '' || cleanData[key] === null || cleanData[key] === undefined || cleanData[key] === 'NaN') {
+                        cleanData[key] = null;
+                    }
                 }
             }
 
@@ -251,103 +256,7 @@ const SupabaseSync = {
             }
             
             const topStatus = document.getElementById('topbar-sync-status');
-            if(topStatus) topStatus.innerHTML = '<span title="Lỗi đồng bộ" style="color:var(--color-danger);">☁️ Lỗi</span>';
-        }
-    },
-
-    async remove(tableName, id) {
-        if (!this.isConnected || this.isSyncing) return;
-        try {
-            await this.client.from(tableName).delete().eq('id', id);
-        } catch (e) {
-            console.error(`Lỗi xóa dữ liệu trên đám mây (${tableName}):`, e);
-        }
-    },
-
-    async forcePushDatabaseJson() {
-        if (!confirm('Bạn có chắc chắn muốn đẩy dữ liệu từ database.json lên Supabase? Quá trình này sẽ mất một lúc.')) return;
-        
-        try {
-            Utils.showToast('Đang đọc database.json...', 'info');
-            const response = await fetch('./database.json?t=' + new Date().getTime());
-            const db = await response.json();
-            
-            // Whitelist: chỉ giữ lại các cột có trong schema Supabase
-            const allowedColumns = {
-                customers: ['id','full_name','phone','zalo_phone','email','address','customer_source','status','tags','note','last_contact_date','next_care_date','care_cycle_days','created_at','updated_at','total_revenue','total_orders','priority_score','overdue_status','transferred_status','last_order_date','last_product_used','keyword_category','last_completed_order_date','getfly_url','stopped_status','estimated_product_end_date','special_note','product_expiries','recall_status','manual_stopped'],
-                products: ['id','product_name','product_category','price','unit_name','quantity_per_unit','unit_type','default_usage_per_day','inner_unit','dosage_per_day','usage_cycle_days','reorder_reminder_days','usage_instruction','description','note','updated_at'],
-                orders: ['id','customer_id','product_id','product_name','order_date','quantity','unit_price','discount','total_amount','order_status','estimated_product_end_date','cancel_reason','note','created_at','updated_at'],
-                care_logs: ['id','customer_id','care_date','care_type','note','created_at'],
-                appointments: ['id','customer_id','appointment_date','note','status','created_at']
-            };
-
-            // Danh sách các trường kiểu ngày cần kiểm tra
-            const dateFields = ['care_date','created_at','updated_at','last_contact_date','next_care_date','last_order_date','last_completed_order_date','estimated_product_end_date','order_date','appointment_date'];
-            // Danh sách các trường kiểu số
-            const numericFields = ['total_revenue','total_orders','priority_score','price','quantity','unit_price','discount','total_amount','quantity_per_unit','default_usage_per_day','usage_cycle_days','reorder_reminder_days','care_cycle_days'];
-            // Danh sách các trường kiểu boolean
-            const boolFields = ['overdue_status','transferred_status','stopped_status','recall_status','manual_stopped'];
-            
-            // Hàm sửa ngày bị đảo tháng/ngày (vd: 2025-23-08 → 2025-08-23)
-            // + chuyển chuỗi rỗng thành null
-            const fixDate = (val) => {
-                if (val === null || val === undefined || val === '') return null;
-                if (typeof val !== 'string') return val;
-                const trimmed = val.trim();
-                if (trimmed === '' || trimmed === 'NaN' || trimmed === 'null' || trimmed === 'undefined') return null;
-                const m = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
-                if (!m) return null; // Không đúng format ngày → null
-                let [, year, month, day] = m;
-                let mo = parseInt(month), dy = parseInt(day);
-                if (mo > 12 && dy <= 12) {
-                    [mo, dy] = [dy, mo]; // Hoán đổi tháng/ngày
-                }
-                if (mo < 1 || mo > 12 || dy < 1 || dy > 31) return null;
-                const fixed = `${year}-${String(mo).padStart(2,'0')}-${String(dy).padStart(2,'0')}`;
-                return trimmed.replace(/^\d{4}-\d{2}-\d{2}/, fixed);
-            };
-            
-            // Hàm làm sạch giá trị theo kiểu dữ liệu
-            const sanitizeValue = (key, val) => {
-                if (dateFields.includes(key)) return fixDate(val);
-                if (numericFields.includes(key)) {
-                    if (val === '' || val === null || val === undefined || val === 'NaN') return null;
-                    const n = Number(val);
-                    return isNaN(n) ? null : n;
-                }
-                if (boolFields.includes(key)) {
-                    if (val === '' || val === null || val === undefined) return null;
-                    return !!val;
-                }
-                return val;
-            };
-
-            const tables = ['customers', 'products', 'orders', 'care_logs', 'appointments'];
-            
-            for (const table of tables) {
-                if (db[table] && db[table].length > 0) {
-                    const cols = allowedColumns[table];
-                    Utils.showToast(`Đang đẩy ${db[table].length} bản ghi lên bảng ${table}...`, 'info');
-                    
-                    for (let i = 0; i < db[table].length; i += 100) {
-                        const batch = db[table].slice(i, i + 100);
-                        const cleanBatch = batch.map(dataObj => {
-                            const cleanData = {};
-                            for (const key of cols) {
-                                if (dataObj[key] !== undefined) {
-                                    cleanData[key] = sanitizeValue(key, dataObj[key]);
-                                }
-                            }
-                            return cleanData;
-                        });
-                        
-                        const { error } = await this.client.from(table).upsert(cleanBatch);
-                        if (error) {
-                            console.error(`Error pushing to ${table}:`, error);
-                            Utils.showToast(`Lỗi khi đẩy bảng ${table}: ${error.message}`, 'error');
-                            return;
-                        }
-                    }
+            if(topStatus) topStatus.innerHTML = '<span title="Lỗi đồng bộ" style="color:var(--color-danger);">�
                     Utils.showToast(`✅ Đã đẩy xong bảng ${table} (${db[table].length} bản ghi)`, 'success');
                 }
             }
@@ -380,10 +289,4 @@ const SupabaseSync = {
     }
 };
 
-window.addEventListener('DOMContentLoaded', () => {
-    // Override window.DriveSyncModule để không sinh lỗi do code cũ gọi
-    window.DriveSyncModule = {
-        isConnected: true,
-        triggerAutoSync: () => {} 
-    };
-});
+

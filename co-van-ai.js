@@ -177,14 +177,26 @@ Chỉ xuất định dạng JSON, không có bất kỳ văn bản nào nằm ng
             }
         };
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${apiKey}`;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        
+        // Retry với exponential backoff khi API quá tải
+        let response;
+        const maxRetries = 3;
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-        if (!response.ok) {
+            if (response.ok) break;
+
+            if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
+                const waitSec = Math.pow(2, attempt);
+                await new Promise(r => setTimeout(r, waitSec * 1000));
+                continue;
+            }
+
             const errData = await response.json().catch(() => ({}));
             throw new Error(errData.error?.message || `Lỗi API (${response.status})`);
         }

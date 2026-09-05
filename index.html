@@ -164,12 +164,6 @@
                     <li class="nav-divider"><span>Hệ thống</span></li>
 
                     <li>
-                        <a href="#" class="nav-link" onclick="SupabaseSync.forcePushDatabaseJson(); return false;" id="nav-sync-json">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                            <span>Đồng bộ lên Cloud</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="#backup" class="nav-link" data-page="backup" id="nav-backup">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                             <span>Backup & Restore</span>
@@ -1031,7 +1025,7 @@
                         </div>
                         <div class="glass-card ai-prompt-area">
                             <h4>📋 Prompt phân tích</h4>
-                            <textarea id="ai-prompt-output" rows="15" readonly placeholder="Prompt sẽ hiển thị ở đây sau khi nhấn 'Tạo Prompt AI'..."></textarea>
+                            <textarea id="ai-prompt-output" rows="15" placeholder="Prompt sẽ hiển thị ở đây sau khi nhấn 'Tạo Prompt AI'..."></textarea>
                             <div class="ai-prompt-actions">
                                 <button class="btn-primary" id="btn-ai-copy-prompt">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -1197,29 +1191,6 @@
                             </div>
                         </div>
                         
-                        <!-- Google Drive Sync Setting -->
-                        <div class="glass-card settings-card">
-                            <h4>☁️ Đồng bộ Google Drive</h4>
-                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;">
-                                Lưu trữ và đồng bộ dữ liệu an toàn trên Google Drive cá nhân của bạn.
-                            </p>
-                            
-                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-                                <div id="drive-sync-status" style="font-weight: 500; font-size: 14px;">🔴 Chưa kết nối</div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn-primary" id="btn-drive-login" onclick="DriveSyncModule.handleAuthClick()">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 
-                                    Kết nối Google Drive
-                                </button>
-                                <button class="btn-secondary" id="btn-drive-sync-now" style="display:none;" onclick="DriveSyncModule.syncWithDrive()">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                                    Đồng bộ ngay
-                                </button>
-                                <button class="btn-danger" id="btn-drive-logout" style="display:none;" onclick="DriveSyncModule.handleSignoutClick()">Ngắt kết nối</button>
-                            </div>
-                        </div>
 
                         <div class="glass-card settings-card">
                             <h4>📅 Chu kỳ chăm sóc</h4>
@@ -1590,7 +1561,7 @@ không mua</textarea>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 
     <!-- Scripts -->
-    <script src="modules/utils.js?v=2.8"></script>
+    <script src="modules/utils.js?v=2.9"></script>
     <script src="modules/supabase-sync.js?v=2.3"></script>
     <script src="modules/database.js?v=2.4"></script>
     <script src="modules/customers.js?v=2.7"></script>
@@ -1603,14 +1574,14 @@ không mua</textarea>
     <script src="modules/zalo.js?v=2.1"></script>
     <script src="modules/revenue.js?v=2.1"></script>
     <script src="modules/charts.js?v=5"></script>
-    <script src="modules/ai-analysis.js?v=2.3"></script>
+    <script src="modules/ai-analysis.js?v=2.5"></script>
     <script src="modules/ai-import.js?v=2.1"></script>
     <script src="modules/backup.js?v=2.1"></script>
     <script src="modules/remedies.js?v=1.0"></script>
-    <script src="modules/drive-sync.js?v=1.0"></script>
+
     <script src="modules/settings.js?v=4"></script>
     <script src="modules/promotions.js?v=1.0"></script>
-    <script src="modules/co-van-ai.js?v=1.1"></script>
+    <script src="modules/co-van-ai.js?v=1.3"></script>
     <script src="modules/ai-history.js?v=1.0"></script>
     <script src="modules/dashboard.js?v=2.3"></script>
     <script src="app.js?v=2.8"></script>

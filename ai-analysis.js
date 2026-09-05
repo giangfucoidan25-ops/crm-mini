@@ -266,14 +266,29 @@ ${JSON.stringify(dataToExport, null, 2)}`;
                 generationConfig: { temperature: 0.7, maxOutputTokens: 65536 }
             };
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${apiKey}`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            
+            // Retry với exponential backoff khi API quá tải
+            let response;
+            const maxRetries = 3;
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            if (!response.ok) {
+                if (response.ok) break;
+
+                // Lỗi 429 (rate limit) hoặc 503 (overloaded) → retry
+                if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
+                    const waitSec = Math.pow(2, attempt); // 2s, 4s
+                    resultContent.innerHTML = `<div style="text-align: center; color: var(--text-muted);">⏳ API đang quá tải, tự động thử lại sau ${waitSec}s... (lần ${attempt}/${maxRetries})</div>`;
+                    await new Promise(r => setTimeout(r, waitSec * 1000));
+                    continue;
+                }
+
+                // Lỗi khác → throw ngay
                 const errData = await response.json().catch(() => ({}));
                 throw new Error(errData.error?.message || `Lỗi API (${response.status})`);
             }

@@ -1,0 +1,17 @@
+ M ai-analysis.js
+ M app.js
+ M co-van-ai.js
+ M database.json
+ M index.html
+ M modules/ai-analysis.js
+ M modules/co-van-ai.js
+ D modules/drive-sync.js
+ M modules/supabase-sync.js
+ M modules/utils.js
+ M utils.js
+?? AutoSync.bat
+?? __pycache__/sync_stats.cpython-312.pyc
+?? check_july.py
+?? fix-gifts.js
+?? fix_july_orders.py
+?? temp_git_status.txt

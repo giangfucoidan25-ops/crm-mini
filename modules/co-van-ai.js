@@ -177,16 +177,41 @@ Chỉ xuất định dạng JSON, không có bất kỳ văn bản nào nằm ng
             }
         };
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${apiKey}`;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        // Danh sách model fallback
+        const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+        let response;
+        let lastError = '';
+
+        for (const model of models) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            const maxRetries = 2;
+            
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) break;
+
+                const errData = await response.json().catch(() => ({}));
+                lastError = errData.error?.message || `Lỗi API (${response.status})`;
+
+                if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
+                    const waitSec = Math.pow(2, attempt);
+                    await new Promise(r => setTimeout(r, waitSec * 1000));
+                    continue;
+                }
+                break;
+            }
+
+            if (response.ok) break;
+            await new Promise(r => setTimeout(r, 1000));
+        }
 
         if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.error?.message || `Lỗi API (${response.status})`);
+            throw new Error(lastError || 'Tất cả model đều không khả dụng.');
         }
 
         const data = await response.json();

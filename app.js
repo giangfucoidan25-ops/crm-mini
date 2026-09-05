@@ -356,7 +356,7 @@ Quang Đức - 19/03/2026 11:43`;
             CoVanAiModule.initEvents();
             DrilldownModule.initEvents();
             if (typeof RemediesModule !== 'undefined' && RemediesModule.init) RemediesModule.init();
-            if (typeof DriveSyncModule !== 'undefined' && DriveSyncModule.init) DriveSyncModule.init();
+
 
             // 5. Xử lý Routing từ URL Hash
             const urlParams = new URLSearchParams(window.location.search);
