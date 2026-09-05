@@ -71,12 +71,10 @@ for idx, row in df.iterrows():
     customer = next((c for c in customers if c.get('phone') == phone or c.get('zalo_phone') == phone), None)
     
     if not customer:
-        # TẠO KHÁCH HÀNG MỚI
         raw_name = str(row.get('Link ẩn, Họ tên và địa chỉ', '')).strip()
         full_name = raw_name
         note = ""
         
-        # Bóc tách mã KH nếu có
         m = re.match(r'(KH\d+\s*-\s*)(.*)', raw_name)
         if m:
             note = f"Mã Excel: {m.group(1).strip('- ')}"
@@ -121,7 +119,9 @@ for idx, row in df.iterrows():
     except Exception:
         continue
 
-    amount_val = row.get('Tổng tiền')
+    # THE FIX IS HERE
+    amount_val = row.get('Tổng tiền ')
+    if pd.isna(amount_val): amount_val = row.get('Tổng tiền')
     if pd.isna(amount_val): amount_val = 0
     try:
         amount = int(str(amount_val).replace(',', '').replace('.', '').strip())
@@ -170,11 +170,9 @@ for idx, row in df.iterrows():
         status_val = str(row.get('Tình trạng', '')).strip().lower()
         order_status = 'COMPLETED' if 'nhận' in status_val else 'DELIVERED'
 
-        # Cập nhật trạng thái khách hàng nếu cần
         if customer.get('status') == 'new':
             customer['status'] = 'purchased'
 
-        # Tìm đơn hàng bị trùng để cập nhật
         existing_order = None
         for o in orders:
             if o.get('customer_id') == customer['id'] and o.get('order_date') == order_date_str:
@@ -207,6 +205,7 @@ for idx, row in df.iterrows():
                 "updated_at": datetime.datetime.now(datetime.UTC).isoformat().replace('+00:00', 'Z')
             }
             db.setdefault('orders', []).append(new_order)
+            orders = db['orders']
             added_orders += 1
             
         if not customer.get('last_order_date') or customer['last_order_date'] < order_date_str:
@@ -216,7 +215,6 @@ for idx, row in df.iterrows():
             if order_status == 'COMPLETED':
                 customer['last_completed_order_date'] = order_date_str
 
-    # Ghi chú
     note_cols = [c for c in df.columns if 'Unnamed' in str(c) or 'Ghi chú' in str(c)]
     for col in note_cols:
         note_val = row.get(col)
@@ -249,6 +247,7 @@ for idx, row in df.iterrows():
                         "created_at": datetime.datetime.now(datetime.UTC).isoformat().replace('+00:00', 'Z')
                     }
                     db.setdefault('care_logs', []).append(new_log)
+                    care_logs = db['care_logs']
                     added_logs += 1
 
 print(f"Matched Customers: {matched_count}")
