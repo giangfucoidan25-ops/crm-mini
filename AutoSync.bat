@@ -1,5 +1,5 @@
 @echo off
-cd /d "%~dp0"
+cd /d "g:\My Drive\Code app\dev_projects\crm-mini"
 title Auto Sync Github - CRM Mini
 color 0A
 echo ===================================================

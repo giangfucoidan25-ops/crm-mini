@@ -1,1 +1,2 @@
+ M AutoSync.bat
  M temp_git_status.txt
