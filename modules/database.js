@@ -653,6 +653,11 @@ const DB = {
             ...updateData,
             updated_at: new Date().toISOString()
         });
+        
+        // Cập nhật lên Cloud nếu đang mở mạng (fix lỗi 'Khác' vì thiếu đồng bộ)
+        if (typeof this.scheduleSync === 'function') {
+            this.scheduleSync('customers');
+        }
     },
 
     async addOrder(order) {

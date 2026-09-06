@@ -282,10 +282,6 @@ const AiImportModule = {
                                 }
                                 
                                 // Xử lý ngày đặt hàng
-                                let oDate = Utils.today();
-                                if (firstOrder.order_date && firstOrder.order_date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                                    oDate = firstOrder.order_date;
-                                }
                                 
                                 // Fix lỗi đảo lộn ngày tháng (nếu ngày văng ra khỏi tháng 7/2026 thì đảo lại)
                                 if (oDate > Utils.today()) {

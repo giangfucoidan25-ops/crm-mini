@@ -640,7 +640,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                     }
                     
-                    localStorage.setItem('supabase_fix_july_v6', 'done');
+                    localStorage.setItem('supabase_fix_july_v7', 'done');
                     console.log('Supabase fix applied and pushed to cloud!');
                 } catch (e) {
                     console.error('Error applying supabase fix:', e);
