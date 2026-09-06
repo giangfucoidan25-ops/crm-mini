@@ -16,13 +16,20 @@ const App = {
             }
 
             // Force reload from cloud ONCE to fix Dexie cache
-            const forcedSync = localStorage.getItem('force_sync_v3');
+            const forcedSync = localStorage.getItem('force_sync_v5');
             if (!forcedSync) {
                 // Clear all indexedDB to force a clean slate from server
                 console.log('Forcing clean sync... deleting old data');
                 await DB.db.delete();
                 await DB.db.open();
-                localStorage.setItem('force_sync_v3', 'done');
+                localStorage.setItem('force_sync_v5', 'done');
+            }
+
+            // Đảm bảo dữ liệu từ database.json được nạp đầy đủ nếu DB trống
+            const currentCustCount = await DB.db.customers.count();
+            if (currentCustCount === 0) {
+                console.log('DB trống, đang nạp dữ liệu từ server database.json...');
+                await DB.syncFromServer();
             }
 
             // Tự động cập nhật sản phẩm Ancan theo giá tiền
@@ -111,14 +118,14 @@ const App = {
             }
 
             // Tự động tính toán lại hạn dùng sản phẩm theo lô (product_expiries)
-            const expiriesFixed = localStorage.getItem('expiries_fixed_v1');
+            const expiriesFixed = localStorage.getItem('expiries_fixed_v3');
             if (!expiriesFixed) {
                 console.log('Recalculating stats for all customers to update product expiries...');
                 const allCustomers = await DB.db.customers.toArray();
                 for (const c of allCustomers) {
                     await DB.recalculateCustomerStats(c.id);
                 }
-                localStorage.setItem('expiries_fixed_v1', 'done');
+                localStorage.setItem('expiries_fixed_v3', 'done');
                 console.log('Done recalculating stats.');
             }
 
@@ -385,9 +392,10 @@ Quang Đức - 19/03/2026 11:43`;
 
         } catch (err) {
             console.error('Initialization failed:', err);
-            document.getElementById('loading-text').textContent = 'Lỗi khởi tạo hệ thống!';
-            document.getElementById('loading-text').style.color = 'var(--color-danger)';
-            Utils.showToast('Lỗi khởi tạo: ' + err.message, 'error');
+            alert('Lỗi khởi tạo hệ thống: ' + (err.message || err.toString()));
+            // Hide loading screen anyway so they can see the app (even if broken)
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) loadingScreen.classList.add('hidden');
         }
     },
 
@@ -592,9 +600,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         await DB.init();
     }
     
+    // Luôn khởi chạy App để giao diện và dữ liệu database.json hiển thị ngay lập tức
+    await App.init();
+    
+    // Nếu có SupabaseSync, khởi tạo chạy ngầm
     if (typeof SupabaseSync !== 'undefined') {
-        await SupabaseSync.init();
-    } else {
-        App.init();
+        try {
+            await SupabaseSync.init();
+        } catch (e) {
+            console.warn('Supabase sync init failed, running in local mode:', e);
+        }
     }
 });

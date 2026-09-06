@@ -26,6 +26,51 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(b'{"error": "Database file not found"}')
+        elif self.path.startswith('/api/fetch-drive-excel'):
+            from urllib.parse import urlparse, parse_qs
+            import urllib.request
+            import pandas as pd
+            import json
+            import traceback
+            import io
+            
+            try:
+                query = parse_qs(urlparse(self.path).query)
+                url = query.get('url', [''])[0]
+                
+                if not url:
+                    raise Exception("Vui lòng cung cấp URL Google Drive")
+                
+                # Transform google sheets link to export link if needed
+                if "docs.google.com/spreadsheets" in url and "/edit" in url:
+                    url = url.split("/edit")[0] + "/export?format=xlsx"
+                    
+                print(f"Fetching Excel from: {url}")
+                
+                req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                with urllib.request.urlopen(req) as response:
+                    excel_data = response.read()
+                    
+                df = pd.read_excel(io.BytesIO(excel_data))
+                df = df.fillna('')
+                
+                records = df.to_dict('records')
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                response_data = {'data': records}
+                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
+                
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({'error': str(e)}).encode('utf-8'))
+                traceback.print_exc()
         else:
             super().do_GET()
 

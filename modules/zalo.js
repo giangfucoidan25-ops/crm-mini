@@ -20,12 +20,12 @@ const ZaloModule = {
         }
 
         container.innerHTML = templates.map(t => `
-            <div class="template-item" data-id="${t.id}" onclick="ZaloModule.selectTemplate(${t.id})">
+            <div class="template-item" data-id="${t.id}" onclick="ZaloModule.selectTemplate(\'${t.id}\')">
                 <div class="template-name">${Utils.escapeHtml(t.template_name)}</div>
                 <div class="template-preview">${Utils.escapeHtml((t.content || '').substring(0, 80))}...</div>
                 <div class="template-actions">
-                    <button class="action-btn btn-edit" onclick="event.stopPropagation(); ZaloModule.editTemplate(${t.id})" title="Sửa">✏️</button>
-                    <button class="action-btn btn-delete" onclick="event.stopPropagation(); ZaloModule.deleteTemplate(${t.id})" title="Xóa">🗑</button>
+                    <button class="action-btn btn-edit" onclick="event.stopPropagation(); ZaloModule.editTemplate(\'${t.id}\')" title="Sửa">✏️</button>
+                    <button class="action-btn btn-delete" onclick="event.stopPropagation(); ZaloModule.deleteTemplate(\'${t.id}\')" title="Xóa">🗑</button>
                 </div>
             </div>
         `).join('');
@@ -36,7 +36,7 @@ const ZaloModule = {
         const select = document.getElementById('zalo-customer-select');
         if (!select) return;
         select.innerHTML = '<option value="">-- Chọn khách hàng --</option>' +
-            customers.map(c => `<option value="${c.id}">${Utils.escapeHtml(c.full_name)} (${c.phone || ''})</option>`).join('');
+            customers.map(c => `<option value="${c.id}">${Utils.escapeHtml(Utils.formatName(c.full_name))} (${c.phone || ''})</option>`).join('');
     },
 
     async populateTemplateSelect() {

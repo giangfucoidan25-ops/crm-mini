@@ -76,7 +76,7 @@ const OrdersModule = {
                 <tr>
                     <td>${Utils.formatDate(o.order_date)}</td>
                     <td>
-                        ${cust ? `<strong style="cursor:pointer;" onclick="CustomersModule.viewCustomer(${cust.id})">${Utils.escapeHtml(cust.full_name)}</strong>` : 'N/A'}
+                        ${cust ? `<strong style="cursor:pointer;" onclick="CustomersModule.viewCustomer('${cust.id}')">${Utils.escapeHtml(Utils.formatName(cust.full_name))}</strong>` : 'N/A'}
                         ${Utils.getGetFlyLink(cust)}
                     </td>
                     <td>
@@ -89,8 +89,8 @@ const OrdersModule = {
                     <td><span class="${expiryStatus.class}">${expiryStatus.label}</span></td>
                     <td>
                         <div class="action-btns">
-                            <button class="action-btn btn-edit" onclick="OrdersModule.editOrder(${o.id})" title="Sửa">✏️</button>
-                            <button class="action-btn btn-delete" onclick="OrdersModule.confirmDelete(${o.id})" title="Xóa">🗑</button>
+                            <button class="action-btn btn-edit" onclick="OrdersModule.editOrder(\'${o.id}\')" title="Sửa">✏️</button>
+                            <button class="action-btn btn-delete" onclick="OrdersModule.confirmDelete(\'${o.id}\')" title="Xóa">🗑</button>
                         </div>
                     </td>
                 </tr>`;
@@ -205,7 +205,7 @@ const OrdersModule = {
                     <label>Khách hàng *</label>
                     <select id="fo-customer" class="select-filter" style="width:100%;" ${(isEdit || defaultCustomerId) ? 'disabled' : ''}>
                         <option value="">-- Chọn khách hàng --</option>
-                        ${customers.map(c => `<option value="${c.id}" ${o.customer_id === c.id ? 'selected' : ''}>${Utils.escapeHtml(c.full_name)} (${c.phone || ''})</option>`).join('')}
+                        ${customers.map(c => `<option value="${c.id}" ${o.customer_id === c.id ? 'selected' : ''}>${Utils.escapeHtml(Utils.formatName(c.full_name))} (${c.phone || ''})</option>`).join('')}
                     </select>
                 </div>
                 <div class="form-group" style="flex: 1; margin-bottom: 0;">

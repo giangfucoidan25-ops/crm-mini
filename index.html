@@ -16,7 +16,7 @@
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Main CSS -->
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="style.css?v=3.0">
 </head>
 <body>
     <!-- ===== LOADING SCREEN ===== -->
@@ -164,6 +164,12 @@
                     <li class="nav-divider"><span>Hệ thống</span></li>
 
                     <li>
+                        <a href="#import-excel" class="nav-link" data-page="import-excel" id="nav-import-excel">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span>Nhập dữ liệu Excel</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="#backup" class="nav-link" data-page="backup" id="nav-backup">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                             <span>Backup & Restore</span>
@@ -222,6 +228,10 @@
                     <h2 id="page-title" class="page-title">Dashboard</h2>
                 </div>
                 <div class="top-bar-right">
+                    <div style="display: flex; gap: 10px; margin-right: 15px;">
+                        <button onclick="DB.saveToServer(true)" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.9rem;" title="Lưu toàn bộ dữ liệu máy tính ra file dự phòng (database.json)">💾 Sao lưu (Local)</button>
+                        <button onclick="if(typeof SupabaseSync !== 'undefined') SupabaseSync.pushAllToSupabase()" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.9rem; border-color: var(--color-warning); color: var(--color-warning);" title="Đẩy toàn bộ dữ liệu máy tính lên Cloud (Chỉ dùng khi cài đặt lần đầu hoặc khi Cloud bị xóa sạch)">☁️ Khôi phục lên Cloud</button>
+                    </div>
                     <div id="topbar-sync-status" style="margin-right: 15px; display: flex; align-items: center;">
                         <span title="Chưa kết nối Google Drive" style="color:var(--text-muted); font-size:1.2rem; cursor:pointer;" onclick="App.navigateTo('settings')">☁️</span>
                     </div>
@@ -1442,6 +1452,63 @@ không mua</textarea>
                 </section>
 
                 <!-- ===== PROMOTIONS PAGE ===== -->
+                <!-- ===== IMPORT EXCEL PAGE ===== -->
+                <section id="page-import-excel" class="page">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h3>Nhập dữ liệu Excel</h3>
+                            <p class="page-subtitle">Nhập hàng loạt khách hàng và đơn hàng từ file</p>
+                        </div>
+                        <div class="page-header-right">
+                            <a href="Mau_Nhap_Lieu_CRM.xlsx" download class="btn-secondary btn-lg">⬇️ Tải file Excel mẫu</a>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <!-- Chế độ 1: Upload thủ công -->
+                        <div class="glass-card settings-card">
+                            <h4>📁 Upload File Từ Máy Tính</h4>
+                            <p style="color:var(--text-muted); font-size:14px; margin-bottom:15px; line-height: 1.5;">Dành cho file Excel bạn đã tải về và điền thông tin. Vui lòng đảm bảo không tự ý đổi tên các cột trong file mẫu.</p>
+                            
+                            <div class="form-group">
+                                <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="input-field" style="padding: 10px;">
+                            </div>
+                            
+                            <button id="btn-import-excel-manual" class="btn-primary btn-lg" style="width: 100%; margin-top: 10px;">🚀 Bắt đầu Nhập dữ liệu</button>
+                        </div>
+                        
+                        <!-- Chế độ 2: Đồng bộ Google Drive -->
+                        <div class="glass-card settings-card">
+                            <h4>☁️ Quét Từ Link Google Drive</h4>
+                            <p style="color:var(--text-muted); font-size:14px; margin-bottom:15px; line-height: 1.5;">Dán link Google Sheets hoặc Google Drive (nhớ mở quyền "Bất kỳ ai có liên kết"). Hệ thống sẽ tải file về và tự động quét.</p>
+                            
+                            <div class="form-group">
+                                <label>Link Google Sheets / Drive Excel</label>
+                                <input type="text" id="import-drive-url" class="input-field" placeholder="https://docs.google.com/spreadsheets/d/...">
+                            </div>
+                            
+                            <div style="display:flex; align-items:center; justify-content:space-between; margin-top: 15px;">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <label class="switch">
+                                        <input type="checkbox" id="import-drive-auto">
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span style="font-size:14px; color:var(--text-main);">Tự quét ngầm mỗi 30 phút</span>
+                                </div>
+                                <button id="btn-import-drive-scan" class="btn-secondary btn-lg">🔍 Quét Ngay</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Kết quả import -->
+                    <div class="glass-card" style="margin-top: 20px;">
+                        <h4>Nhật ký Xử lý</h4>
+                        <div id="import-log-container" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; height: 250px; overflow-y: auto; font-family: monospace; font-size: 13px; line-height: 1.6; margin-top: 10px;">
+                            <span style="color:var(--text-muted);">Chưa có hoạt động nào...</span>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="page-promotions" class="page">
                     <div class="page-header">
                         <div class="page-header-left">
@@ -1561,29 +1628,30 @@ không mua</textarea>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 
     <!-- Scripts -->
-    <script src="modules/utils.js?v=2.9"></script>
-    <script src="modules/supabase-sync.js?v=2.3"></script>
-    <script src="modules/database.js?v=2.4"></script>
-    <script src="modules/customers.js?v=2.7"></script>
-    <script src="modules/products.js?v=1.6"></script>
-    <script src="modules/orders.js?v=2.4"></script>
-    <script src="modules/care.js?v=2.5"></script>
-    <script src="modules/stopped.js?v=2.3"></script>
-    <script src="modules/cancelled.js?v=1.0"></script>
-    <script src="modules/transferred.js?v=2.5"></script>
-    <script src="modules/zalo.js?v=2.1"></script>
-    <script src="modules/revenue.js?v=2.1"></script>
+    <script src="modules/utils.js?v=3.0"></script>
+    <script src="modules/supabase-sync.js?v=3.0"></script>
+    <script src="modules/database.js?v=3.0"></script>
+    <script src="modules/customers.js?v=3.0"></script>
+    <script src="modules/products.js?v=3.0"></script>
+    <script src="modules/orders.js?v=3.0"></script>
+    <script src="modules/care.js?v=3.0"></script>
+    <script src="modules/stopped.js?v=3.0"></script>
+    <script src="modules/cancelled.js?v=3.0"></script>
+    <script src="modules/transferred.js?v=3.0"></script>
+    <script src="modules/zalo.js?v=3.0"></script>
+    <script src="modules/revenue.js?v=3.0"></script>
     <script src="modules/charts.js?v=5"></script>
-    <script src="modules/ai-analysis.js?v=2.5"></script>
-    <script src="modules/ai-import.js?v=2.1"></script>
-    <script src="modules/backup.js?v=2.1"></script>
-    <script src="modules/remedies.js?v=1.0"></script>
+    <script src="modules/ai-analysis.js?v=3.0"></script>
+    <script src="modules/ai-import.js?v=3.0"></script>
+    <script src="modules/backup.js?v=3.0"></script>
+    <script src="modules/remedies.js?v=3.0"></script>
 
     <script src="modules/settings.js?v=4"></script>
-    <script src="modules/promotions.js?v=1.0"></script>
-    <script src="modules/co-van-ai.js?v=1.3"></script>
-    <script src="modules/ai-history.js?v=1.0"></script>
-    <script src="modules/dashboard.js?v=2.3"></script>
-    <script src="app.js?v=2.8"></script>
+    <script src="modules/promotions.js?v=3.0"></script>
+    <script src="modules/co-van-ai.js?v=3.0"></script>
+    <script src="modules/ai-history.js?v=3.0"></script>
+    <script src="modules/dashboard.js?v=3.0"></script>
+    <script src="modules/import-excel.js?v=3.0"></script>
+    <script src="app.js?v=3.0"></script>
 </body>
 </html>

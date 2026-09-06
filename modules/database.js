@@ -11,36 +11,46 @@ const DB = {
     async init() {
         this.db = new Dexie('CRMminiDB');
 
-        this.db.version(1).stores({
-            customers: '++id, full_name, phone, zalo_phone, customer_source, status, tags, last_contact_date, next_care_date, overdue_status, transferred_status, total_revenue, priority_score, created_at',
-            products: '++id, product_name, product_category, price, active_status, created_at',
-            orders: '++id, customer_id, product_id, order_date, order_status, total_amount, estimated_product_end_date, created_at',
-            care_logs: '++id, customer_id, care_date, care_type, created_at',
-            message_templates: '++id, template_name, created_at',
+        this.db.version(5).stores({
+            customers: 'id, full_name, phone, zalo_phone, customer_source, status, tags, last_contact_date, next_care_date, overdue_status, transferred_status, total_revenue, priority_score, created_at',
+            products: 'id, product_name, product_category, price, active_status, created_at',
+            orders: 'id, customer_id, product_id, order_date, order_status, total_amount, estimated_product_end_date, created_at',
+            care_logs: 'id, customer_id, care_date, care_type, created_at',
+            message_templates: 'id, template_name, created_at',
             settings: 'key',
-            backup_logs: '++id, backup_date'
+            backup_logs: 'id, backup_date',
+            appointments: 'id, customer_id, appointment_date, status, created_at',
+            ai_sessions: 'id, timestamp, time_range, created_at',
+            ai_analysis_history: 'id, analysis_type, created_at'
         });
 
-        this.db.version(2).stores({
-            appointments: '++id, customer_id, appointment_date, status, created_at'
-        });
-
-        this.db.version(3).stores({
-            ai_sessions: '++id, timestamp, time_range, created_at'
-        });
-
-        this.db.version(4).stores({
-            ai_analysis_history: '++id, analysis_type, created_at'
-        });
-
-        await this.db.open();
+        try {
+            await this.db.open();
+        } catch (e) {
+            console.error('Lỗi nâng cấp CSDL (do đổi khóa chính sang UUID). Đang tiến hành xóa và tạo lại CSDL cục bộ...', e);
+            await Dexie.delete('CRMminiDB');
+            this.db = new Dexie('CRMminiDB');
+            this.db.version(5).stores({
+                customers: 'id, full_name, phone, zalo_phone, customer_source, status, tags, last_contact_date, next_care_date, overdue_status, transferred_status, total_revenue, priority_score, created_at',
+                products: 'id, product_name, product_category, price, active_status, created_at',
+                orders: 'id, customer_id, product_id, order_date, order_status, total_amount, estimated_product_end_date, created_at',
+                care_logs: 'id, customer_id, care_date, care_type, created_at',
+                message_templates: 'id, template_name, created_at',
+                settings: 'key',
+                backup_logs: 'id, backup_date',
+                appointments: 'id, customer_id, appointment_date, status, created_at',
+                ai_sessions: 'id, timestamp, time_range, created_at',
+                ai_analysis_history: 'id, analysis_type, created_at'
+            });
+            await this.db.open();
+        }
         console.log('✅ Database initialized successfully');
 
         // Khởi tạo settings mặc định
         await this.initDefaultSettings();
 
-        // Tự động đồng bộ từ server Google Drive (CŨ)
-        // await this.syncFromServer();
+        // Tự động kéo từ Két sắt (Local Server) nếu CSDL trên máy trống rỗng
+        await this.syncFromServer();
         
         // Đăng ký Dexie Hooks để đẩy dữ liệu lên Supabase tự động
         const tablesToSync = ['customers', 'products', 'orders', 'care_logs', 'appointments', 'message_templates'];
@@ -357,6 +367,7 @@ const DB = {
 
     // ===== CUSTOMERS CRUD =====
     async addCustomer(customer) {
+        customer.id = Utils.generateId();
         customer.created_at = new Date().toISOString();
         customer.updated_at = customer.created_at;
         customer.total_revenue = customer.total_revenue || 0;
@@ -453,6 +464,7 @@ const DB = {
 
     // ===== PRODUCTS CRUD =====
     async addProduct(product) {
+        product.id = Utils.generateId();
         product.created_at = new Date().toISOString();
         product.updated_at = product.created_at;
         product.active_status = product.active_status !== false;
@@ -519,13 +531,13 @@ const DB = {
             }
         }
 
-        const completedOrders = orders.filter(o => o.order_status === 'completed').sort((a, b) => a.order_date > b.order_date ? -1 : 1);
+        const completedOrders = orders.filter(o => ['completed', 'delivered', 'shipping'].includes(o.order_status)).sort((a, b) => a.order_date > b.order_date ? -1 : 1);
         if (completedOrders.length > 0) {
             last_completed_order_date = completedOrders[0].order_date;
         }
 
         for (const o of orders) {
-            if (o.order_status === 'completed') {
+            if (['completed', 'delivered', 'shipping'].includes(o.order_status)) {
                 total_revenue += (o.total_amount || 0);
             }
         }
@@ -618,6 +630,7 @@ const DB = {
     },
 
     async addOrder(order) {
+        order.id = Utils.generateId();
         order.created_at = new Date().toISOString();
         order.updated_at = order.created_at;
 
@@ -729,6 +742,7 @@ const DB = {
     },
 
     async addCareLog(log) {
+        log.id = Utils.generateId();
         if (!log.created_at) {
             log.created_at = new Date().toISOString();
         }
@@ -949,7 +963,27 @@ const DB = {
     _syncLock: Promise.resolve(),
 
     async saveToServer(isUnloading = false) {
-        // Disabled: Cũ
+        try {
+            const data = await this.exportAllData();
+            const baseTimestamp = await this.getSetting('last_sync_timestamp') || '';
+            const res = await fetch('/api/save-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Base-Timestamp': baseTimestamp
+                },
+                body: JSON.stringify(data),
+                keepalive: isUnloading
+            });
+            if (res.ok) {
+                await this.setSetting('last_sync_timestamp', data.exported_at);
+                console.log('✅ Đã lưu CSDL vào database.json trên máy.');
+            } else {
+                console.warn('⚠️ Server save-data returned status:', res.status);
+            }
+        } catch (e) {
+            console.error('❌ Lưu vào database.json thất bại:', e);
+        }
     },
 
     async fixCompletedOrderDates() {
@@ -977,7 +1011,7 @@ const DB = {
 
         await currentLock;
         try {
-            console.log('☁️ Fetching database from server...');
+            console.log('☁️ Đang đọc dữ liệu từ server database.json...');
             const response = await fetch('/api/get-data');
             if (response.status === 200) {
                 const serverData = await response.json();
@@ -998,7 +1032,6 @@ const DB = {
                             }
                             if (updated > 0) {
                                 console.log(`🔗 Merged ${updated} full getfly links to local DB!`);
-                                // Refresh current UI if it's customers table
                                 if (window.CustomersModule && typeof CustomersModule.renderTable === 'function') {
                                     CustomersModule.loadCustomers();
                                 }
@@ -1008,18 +1041,20 @@ const DB = {
                         }
                     }
 
+                    const localCustCount = await this.db.customers.count();
                     const localTimestamp = await this.getSetting('last_sync_timestamp');
 
-                    if (!localTimestamp || serverData.exported_at > localTimestamp) {
-                        console.log(`☁️ Synced database is newer (Server: ${serverData.exported_at}, Local: ${localTimestamp || 'None'}). Importing...`);
+                    if (localCustCount === 0 || !localTimestamp || serverData.exported_at > localTimestamp) {
+                        console.log(`☁️ Dữ liệu database.json mới hơn hoặc DB cục bộ trống (Server: ${serverData.exported_at}, Local: ${localTimestamp || 'None'}, KH: ${localCustCount}). Đang nạp...`);
                         await this.importAllData(serverData, true);
-                        console.log('✅ Local database updated from server data.');
+                        await this.setSetting('last_sync_timestamp', serverData.exported_at);
+                        console.log('✅ Đã nạp thành công dữ liệu từ database.json vào trình duyệt.');
                     } else {
-                        console.log('☁️ Local database is already up to date or newer.');
+                        console.log('☁️ CSDL trình duyệt đã đồng bộ mới nhất.');
                     }
                 }
             } else if (response.status === 404) {
-                console.log('☁️ Server database.json not found. Creating first save...');
+                console.log('☁️ Chưa tìm thấy database.json trên server. Tạo bản lưu đầu tiên...');
                 await this.saveToServer();
             } else {
                 console.warn('☁️ Fetch server database failed with code:', response.status);

@@ -116,14 +116,14 @@ const DashboardModule = {
             <div class="customer-mini">
                 <div class="customer-mini-info">
                     <div class="customer-mini-name">
-                        <span style="cursor:pointer;" onclick="CustomersModule.viewCustomer(${c.id})">${Utils.escapeHtml(c.full_name)}</span>
+                        <span style="cursor:pointer;" onclick="CustomersModule.viewCustomer(\'${c.id}\')">${Utils.escapeHtml(Utils.formatName(c.full_name))}</span>
                         ${Utils.getGetFlyLink(c)}
                     </div>
                     <div class="customer-mini-detail">${c.phone || ''} • ${Utils.sourceLabel(c.customer_source)}</div>
                 </div>
                 <div class="customer-mini-actions">
                     <button class="action-btn btn-zalo" onclick="ZaloModule.openZalo('${c.zalo_phone || c.phone}')" title="Mở Zalo">💬</button>
-                    <button class="action-btn btn-care" onclick="CareModule.markCared(${c.id})" title="Đánh dấu đã chăm sóc" style="color:${careStatus.status === 'ok' ? 'var(--color-success)' : 'var(--text-muted)'};">${careStatus.status === 'ok' ? '✓' : '☐'}</button>
+                    <button class="action-btn btn-care" onclick="CareModule.markCared(\'${c.id}\')" title="Đánh dấu đã chăm sóc" style="color:${careStatus.status === 'ok' ? 'var(--color-success)' : 'var(--text-muted)'};">${careStatus.status === 'ok' ? '✓' : '☐'}</button>
                 </div>
             </div>
         `;}).join('');
@@ -146,7 +146,7 @@ const DashboardModule = {
             <div class="customer-mini">
                 <div class="customer-mini-info">
                     <div class="customer-mini-name">
-                        <span style="cursor:pointer;" onclick="CustomersModule.viewCustomer(${c.id})">${Utils.escapeHtml(c.full_name)}</span>
+                        <span style="cursor:pointer;" onclick="CustomersModule.viewCustomer(\'${c.id}\')">${Utils.escapeHtml(Utils.formatName(c.full_name))}</span>
                         ${Utils.getGetFlyLink(c)}
                     </div>
                     <div class="customer-mini-detail">${c._reasons.join(', ')}</div>

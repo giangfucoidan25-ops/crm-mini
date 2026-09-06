@@ -52,7 +52,7 @@ const AiHistoryModule = {
             }
 
             html += `
-                <div class="ai-history-item" onclick="AiHistoryModule.viewDetail(${session.id})" id="ai-session-${session.id}">
+                <div class="ai-history-item" onclick="AiHistoryModule.viewDetail(\'${session.id}\')" id="ai-session-${session.id}">
                     <div class="ai-history-item-left">
                         <div class="ai-history-title">Phân tích kinh doanh — ${Utils.escapeHtml(session.time_range)}</div>
                         <div class="ai-history-subtitle">${Utils.escapeHtml(previewTask)}</div>
@@ -99,7 +99,7 @@ const AiHistoryModule = {
                     <div class="ai-checklist-items">
                         ${session.action_items.map((item, index) => `
                             <label class="ai-checklist-item">
-                                <input type="checkbox" onchange="AiHistoryModule.toggleAction(${session.id}, ${index}, this.checked)" ${item.completed ? 'checked' : ''}>
+                                <input type="checkbox" onchange="AiHistoryModule.toggleAction(\'${session.id}\', ${index}, this.checked)" ${item.completed ? 'checked' : ''}>
                                 <span class="ai-checklist-text">${Utils.escapeHtml(item.text)}</span>
                             </label>
                         `).join('')}

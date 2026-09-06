@@ -47,8 +47,8 @@ const ProductsModule = {
                     </div>
                     ${p.usage_instruction ? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">📋 ${Utils.escapeHtml(p.usage_instruction)}</div>` : ''}
                     <div class="product-card-actions">
-                        <button class="btn-secondary btn-sm" onclick="ProductsModule.editProduct(${p.id})">✏️ Sửa</button>
-                        <button class="btn-secondary btn-sm" onclick="ProductsModule.confirmDelete(${p.id})" style="color:var(--color-danger);">🗑️ Xóa</button>
+                        <button class="btn-secondary btn-sm" onclick="ProductsModule.editProduct(\'${p.id}\')">✏️ Sửa</button>
+                        <button class="btn-secondary btn-sm" onclick="ProductsModule.confirmDelete(\'${p.id}\')" style="color:var(--color-danger);">🗑️ Xóa</button>
                     </div>
                 </div>
             `).join('');

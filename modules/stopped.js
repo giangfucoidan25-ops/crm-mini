@@ -56,7 +56,7 @@ const StoppedModule = {
             <tr>
                 <td>${start + idx + 1}</td>
                 <td>
-                    <strong style="cursor:pointer;color:var(--color-primary);" onclick="CustomersModule.viewCustomer(${c.id})">[ID: ${c.id}] ${Utils.escapeHtml(c.full_name)}</strong>
+                    <strong style="cursor:pointer;color:var(--color-primary);" onclick="CustomersModule.viewCustomer('${c.id}')">${Utils.escapeHtml(Utils.formatName(c.full_name))}</strong>
                     ${Utils.getGetFlyLink(c)}
                     <div style="font-size:12px;color:var(--text-muted);">${Utils.sourceLabel(c.customer_source)}</div>
                 </td>
@@ -71,12 +71,12 @@ const StoppedModule = {
                 <td style="text-align: center;">
                     <input type="checkbox" style="transform: scale(1.5); cursor: pointer;" 
                         ${c.manual_stopped ? 'checked' : ''} 
-                        onclick="StoppedModule.toggleManualConfirm(${c.id}, this.checked)"
+                        onclick="StoppedModule.toggleManualConfirm(\'${c.id}\', this.checked)"
                         title="Đánh dấu đã xác nhận thủ công (bỏ qua khi quét AI)">
                 </td>
                 <td>
                     <div class="action-btns" style="min-width:max-content;">
-                        <button class="action-btn btn-care" onclick="StoppedModule.resumeCustomer(${c.id})" title="Khôi phục chăm sóc">🔄 Khôi phục</button>
+                        <button class="action-btn btn-care" onclick="StoppedModule.resumeCustomer(\'${c.id}\')" title="Khôi phục chăm sóc">🔄 Khôi phục</button>
                     </div>
                 </td>
             </tr>

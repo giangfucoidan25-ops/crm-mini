@@ -23,6 +23,26 @@ const Utils = {
         return amount.toLocaleString('vi-VN');
     },
 
+    formatName: function(name) {
+        if (!name) return '';
+        name = name.normalize('NFC');
+        // 1. Cắt từ các từ khóa địa chỉ/tổ chức
+        const kwRegex = /(?:\s+|,)(ấp|tổ|khóm|khu\s+phố|kp|phường|xã|quận|huyện|thị\s+xã|tx|tp|thành\s+phố|tỉnh|đường|số|số\s+nhà|thôn|xóm|nhà|chung\s+cư|tòa|ngõ|ngách|hẻm|cụm|kđt|khu\s+đô\s+thị|trường|chùa|bệnh\s+viện|khu\s+dân\s+cư|nhà\s+nghỉ|trung\s+tâm|ủy\s+ban)(?:\s|$|,|\.)/i;
+        let match = name.match(kwRegex);
+        if (match) {
+            name = name.substring(0, match.index);
+        }
+        
+        // 2. Cắt từ các con số có vẻ là số nhà (chứa xẹt '/', hoặc số lớn đứng độc lập)
+        const numRegex = /(?:\s+|,)([a-zA-Z]?\d+[\/\-][\d\w\/\-]+|[a-zA-Z]?\d{2,}[a-zA-Z]?)(?:\s|$|,|\.)/i;
+        match = name.match(numRegex);
+        if (match) {
+            name = name.substring(0, match.index);
+        }
+        
+        return name.trim().replace(/,+$/, '').trim();
+    },
+
     // ===== Format số điện thoại =====
     formatPhone(phone) {
         if (!phone) return '';

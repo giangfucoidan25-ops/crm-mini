@@ -172,7 +172,7 @@ const CustomersModule = {
                         <div style="display:flex;align-items:center;gap:8px;">
                             <div>
                                 ${orderDateHtml}
-                                <strong style="cursor:pointer;" onclick="CustomersModule.viewCustomer(${c.id})">[ID: ${c.id}] ${Utils.escapeHtml(c.full_name)}</strong>
+                                <strong style="cursor:pointer;" onclick="CustomersModule.viewCustomer('${c.id}')">${Utils.escapeHtml(Utils.formatName(c.full_name))}</strong>
                                 ${Utils.getGetFlyLink(c)}
                                 ${careTypeSuffix}
                                 ${c.tags ? `<span class="badge badge-purple" style="margin-left:4px;">${c.tags}</span>` : ''}
@@ -187,12 +187,12 @@ const CustomersModule = {
                     <td>
                         <div class="action-btns">
 
-                            <button class="action-btn btn-care" onclick="CustomersModule.viewCustomer(${c.id}, 'traodoi')" title="Note Chăm sóc" style="color:var(--color-primary);">📝</button>
+                            <button class="action-btn btn-care" onclick="CustomersModule.viewCustomer(\'${c.id}\', 'traodoi')" title="Note Chăm sóc" style="color:var(--color-primary);">📝</button>
                             <button class="action-btn btn-zalo" onclick="ZaloModule.openZalo('${c.zalo_phone || c.phone}')" title="Zalo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.28 15.71C22.25 14.23 23 12.56 23 10.5C23 5.8 18.07 2 12 2C5.93 2 1 5.8 1 10.5C1 15.2 5.93 19 12 19C13.43 19 14.79 18.66 16 18.06C16.54 17.79 17.18 17.81 17.7 18.15L21.37 20.57C22.09 21.04 23 20.53 22.84 19.67L22.05 15.35C21.94 14.76 22.18 14.16 22.68 13.78L21.28 15.71Z" fill="currentColor"/><path d="M16 13H8V11L13.5 6H8V4H16V6L10.5 11H16V13Z" fill="white"/></svg></button>
-                            <button class="action-btn btn-order" onclick="OrdersModule.showForm(null, ${c.id})" title="Thêm đơn hàng">🛒</button>
-                            <button class="action-btn btn-care" onclick="CareModule.markCared(${c.id})" title="Đánh dấu đã chăm sóc" style="${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? 'color:var(--color-success);font-weight:bold;' : 'display:inline-flex;align-items:center;justify-content:center;'}">${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? '✓' : '<div style="width:14px;height:14px;border:2px solid #fff;border-radius:3px;display:inline-block;"></div>'}</button>
-                            <button class="action-btn btn-edit" onclick="CustomersModule.editCustomer(${c.id})" title="Sửa">✏️</button>
-                            <button class="action-btn btn-delete" onclick="CustomersModule.confirmDelete(${c.id})" title="Xóa">🗑</button>
+                            <button class="action-btn btn-order" onclick="OrdersModule.showForm(null, \'${c.id}\')" title="Thêm đơn hàng">🛒</button>
+                            <button class="action-btn btn-care" onclick="CareModule.markCared(\'${c.id}\')" title="Đánh dấu đã chăm sóc" style="${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? 'color:var(--color-success);font-weight:bold;' : 'display:inline-flex;align-items:center;justify-content:center;'}">${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? '✓' : '<div style="width:14px;height:14px;border:2px solid #fff;border-radius:3px;display:inline-block;"></div>'}</button>
+                            <button class="action-btn btn-edit" onclick="CustomersModule.editCustomer(\'${c.id}\')" title="Sửa">✏️</button>
+                            <button class="action-btn btn-delete" onclick="CustomersModule.confirmDelete(\'${c.id}\')" title="Xóa">🗑</button>
                         </div>
                     </td>
                 </tr>`;
@@ -295,7 +295,7 @@ const CustomersModule = {
     currentViewingTab: 'traodoi',
 
     async viewCustomer(id, activeTab = 'traodoi') {
-        this.currentViewingId = Number(id);
+        this.currentViewingId = id;
         this.currentViewingTab = activeTab;
         if (window.location.hash === '#customer-detail') {
             this.renderCustomerDetailPage(id);
@@ -344,9 +344,9 @@ const CustomersModule = {
                         <div class="cd-avatar">${c.full_name ? c.full_name.charAt(0).toUpperCase() : '👤'}</div>
                         <div>
                             <div style="font-weight:bold;font-size:16px;color:var(--text-primary);display:flex;align-items:center;gap:4px;">
-                                ${Utils.escapeHtml(c.full_name)}
+                                ${Utils.escapeHtml(Utils.formatName(c.full_name))}
                                 ${Utils.getGetFlyLink(c)}
-                                <span style="cursor:pointer;" onclick="CustomersModule.editCustomer(${c.id})" title="Sửa KH">✏️</span>
+                                <span style="cursor:pointer;" onclick="CustomersModule.editCustomer(\'${c.id}\')" title="Sửa KH">✏️</span>
                             </div>
                             <div style="font-size:13px;color:var(--text-muted);">${c.phone || ''}</div>
                         </div>
@@ -411,7 +411,7 @@ const CustomersModule = {
                             <div class="cd-stat-value" style="color:var(--color-success);">${Utils.formatCurrency(calculatedRevenue)}</div>
                         </div>
                         <div style="display:flex; gap:8px; align-items:center; margin-left: auto;">
-                            <button class="btn-primary" onclick="OrdersModule.showForm(null, ${c.id})">🛒 Thêm Đơn</button>
+                            <button class="btn-primary" onclick="OrdersModule.showForm(null, \'${c.id}\')">🛒 Thêm Đơn</button>
                             <button class="btn-secondary" onclick="ZaloModule.openZalo('${c.zalo_phone || c.phone}')">💬 Zalo</button>
                         </div>
                     </div>
@@ -484,7 +484,7 @@ const CustomersModule = {
                                         <input type="checkbox" id="care-note-remedy-toggle"> Bài thuốc hay
                                     </label>
                                 </div>
-                                <button id="btn-submit-care-note" class="btn-primary" onclick="CustomersModule.submitCareNote(${c.id}, this)">Gửi</button>
+                                <button id="btn-submit-care-note" class="btn-primary" onclick="CustomersModule.submitCareNote(\'${c.id}\', this)">Gửi</button>
                             </div>
                         </div>
 
@@ -492,7 +492,7 @@ const CustomersModule = {
                             <span style="font-size:14px; font-weight:600; color:var(--text-primary);"><span id="care-note-selected-count">0</span> mục đã chọn</span>
                             <div style="display:flex; gap:8px;">
                                 <button class="btn-secondary" onclick="CustomersModule.toggleDeleteMode()" style="font-size:13px; padding:6px 12px;">Hủy</button>
-                                <button class="btn-primary" onclick="CustomersModule.deleteSelectedCareNotes(${c.id})" style="font-size:13px; padding:6px 12px; background:var(--color-danger); border:none;">Xác nhận Xóa</button>
+                                <button class="btn-primary" onclick="CustomersModule.deleteSelectedCareNotes(\'${c.id}\')" style="font-size:13px; padding:6px 12px; background:var(--color-danger); border:none;">Xác nhận Xóa</button>
                             </div>
                         </div>
 
@@ -544,7 +544,7 @@ const CustomersModule = {
                                             <span class="cd-log-name" style="font-weight:700; font-size:14.5px; color:var(--text-primary);">${Utils.escapeHtml(author)} | ${displayTime}</span>
                                             <span class="badge badge-purple" style="margin-left:8px;font-size:10px;">${log.care_type}</span>
                                             <div style="margin-left:auto;">
-                                                <button onclick="CustomersModule.editCareNote(${log.id}, ${c.id})" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-muted);" title="Sửa">✏️</button>
+                                                <button onclick="CustomersModule.editCareNote(\'${log.id}\', \'${c.id}\')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-muted);" title="Sửa">✏️</button>
                                                 <button onclick="CustomersModule.toggleDeleteMode()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-muted);" title="Xóa nhiều">🗑</button>
                                             </div>
                                         </div>
@@ -570,11 +570,11 @@ const CustomersModule = {
                     <!-- TAB: GIAO DỊCH -->
                     <div class="cd-tab-content ${activeTab === 'giaodich' ? 'active' : ''}" id="cd-tab-giaodich" style="overflow-y:auto;">
                         ${orders.length > 0 ? orders.sort((a, b) => new Date(b.order_date) - new Date(a.order_date)).map(o => `
-                            <div class="cd-log-card" style="align-items:center;cursor:pointer;" onclick="OrdersModule.editOrder(${o.id})" title="Sửa thông tin đơn hàng">
+                            <div class="cd-log-card" style="align-items:center;cursor:pointer;" onclick="OrdersModule.editOrder(\'${o.id}\')" title="Sửa thông tin đơn hàng">
                                 <div class="cd-log-avatar" style="background:var(--color-success);color:#fff;">🛒</div>
                                 <div class="cd-log-content">
                                     <div class="cd-log-header">
-                                        <span class="cd-log-name">Đơn hàng #${o.id}</span>
+                                        <span class="cd-log-name">Đơn hàng</span>
                                         <span class="cd-log-time">${Utils.formatDate(o.order_date)}</span>
                                         <span class="badge ${o.order_status === 'completed' ? 'badge-success' : 'badge-warning'}" style="margin-left:auto;">${Utils.orderStatusLabel(o.order_status)}</span>
                                     </div>
@@ -591,7 +591,7 @@ const CustomersModule = {
                     <!-- TAB: LỊCH HẸN -->
                     <div class="cd-tab-content ${activeTab === 'lichhen' ? 'active' : ''}" id="cd-tab-lichhen" style="overflow-y:auto;">
                         <div style="margin-bottom:12px;text-align:right;">
-                            <button class="btn-primary" onclick="CustomersModule.showAppointmentForm(${c.id})">+ Thêm lịch hẹn</button>
+                            <button class="btn-primary" onclick="CustomersModule.showAppointmentForm(\'${c.id}\')">+ Thêm lịch hẹn</button>
                         </div>
                         ${appointments.length > 0 ? appointments.map(a => `
                             <div class="cd-log-card" style="align-items:center; ${a.status === 'completed' ? 'opacity:0.6;' : ''}">
@@ -604,9 +604,9 @@ const CustomersModule = {
                                     </div>
                                     <div class="cd-log-text" style="${a.status === 'completed' ? 'text-decoration:line-through;' : ''}">${Utils.escapeHtml(a.note || '').replace(/\n/g, '<br>')}</div>
                                     <div style="margin-top:8px; display:flex; gap:8px;">
-                                        ${a.status !== 'completed' ? `<button class="btn-success btn-sm" onclick="CustomersModule.completeAppointment(${a.id}, ${c.id})">✔️ Đánh dấu xong</button>` : ''}
-                                        <button class="btn-primary btn-sm" onclick="CustomersModule.showAppointmentForm(${c.id}, ${a.id})">✏️ Sửa</button>
-                                        <button class="btn-danger btn-sm" onclick="CustomersModule.deleteAppointment(${a.id}, ${c.id})">🗑 Xóa</button>
+                                        ${a.status !== 'completed' ? `<button class="btn-success btn-sm" onclick="CustomersModule.completeAppointment(\'${a.id}\', \'${c.id}\')">✔️ Đánh dấu xong</button>` : ''}
+                                        <button class="btn-primary btn-sm" onclick="CustomersModule.showAppointmentForm(\'${c.id}\', \'${a.id}\')">✏️ Sửa</button>
+                                        <button class="btn-danger btn-sm" onclick="CustomersModule.deleteAppointment(\'${a.id}\', \'${c.id}\')">🗑 Xóa</button>
                                     </div>
                                 </div>
                             </div>

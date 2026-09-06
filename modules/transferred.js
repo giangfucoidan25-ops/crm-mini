@@ -56,7 +56,7 @@ window.TransferredModule = {
             <tr>
                 <td>${start + idx + 1}</td>
                 <td>
-                    <strong style="cursor:pointer;color:var(--color-primary);" onclick="CustomersModule.viewCustomer(${c.id})">[ID: ${c.id}] ${Utils.escapeHtml(c.full_name)}</strong>
+                    <strong style="cursor:pointer;color:var(--color-primary);" onclick="CustomersModule.viewCustomer('${c.id}')">${Utils.escapeHtml(Utils.formatName(c.full_name))}</strong>
                     ${Utils.getGetFlyLink(c)}
                     <div style="font-size:12px;color:var(--text-muted);">${Utils.sourceLabel(c.customer_source)}</div>
                 </td>
@@ -72,7 +72,7 @@ window.TransferredModule = {
                 <td><span class="badge badge-purple">${c.total_orders || 0} đơn</span></td>
                 <td>
                     <div class="action-btns" style="min-width:max-content;">
-                        <button class="action-btn btn-care" onclick="TransferredModule.resumeCustomer(${c.id})" title="Khôi phục lại">🔄 Khôi phục</button>
+                        <button class="action-btn btn-care" onclick="TransferredModule.resumeCustomer(\'${c.id}\')" title="Khôi phục lại">🔄 Khôi phục</button>
                     </div>
                 </td>
             </tr>

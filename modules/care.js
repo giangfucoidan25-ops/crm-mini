@@ -305,7 +305,7 @@ const CareModule = {
                 <tr>
                     <td>${startIndex + index + 1}</td>
                     <td>
-                        <strong style="cursor:pointer;" onclick="CustomersModule.viewCustomer(${c.id})">[ID: ${c.id}] ${Utils.escapeHtml(c.full_name)}</strong>
+                        <strong style="cursor:pointer;" onclick="CustomersModule.viewCustomer('${c.id}')">${Utils.escapeHtml(Utils.formatName(c.full_name))}</strong>
                         ${c._isRecentCNM ? '<span style="background:#fff3cd; color:#856404; font-size:10px; margin-left:6px; padding:2px 4px; border-radius:4px; border:1px solid #ffeeba;">📞 Hôm nay CNM</span>' : ''}
                         ${Utils.getGetFlyLink(c)}${careTypeSuffix}${recallSuffix}
                         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${Utils.sourceLabel(c.customer_source)} • ${c.last_product_used || '—'}</div>
@@ -322,12 +322,12 @@ const CareModule = {
                     </td>
                     <td>
                         <div class="action-btns">
-                            <button class="action-btn btn-care" onclick="CustomersModule.viewCustomer(${c.id}, 'traodoi')" title="Note Chăm sóc" style="color:var(--color-primary);">📝</button>
+                            <button class="action-btn btn-care" onclick="CustomersModule.viewCustomer(\'${c.id}\', 'traodoi')" title="Note Chăm sóc" style="color:var(--color-primary);">📝</button>
                             <button class="action-btn btn-zalo" onclick="ZaloModule.openZalo('${c.zalo_phone || c.phone}')" title="Mở Zalo">💬</button>
-                            <button class="action-btn btn-recall" onclick="CareModule.markRecall(${c.id})" title="Chưa nghe máy / Cần gọi lại" style="color:${c.recall_status ? 'var(--color-warning)' : 'var(--text-muted)'}; font-weight:bold;">↻</button>
-                            <button class="action-btn btn-order" onclick="OrdersModule.showForm(null, ${c.id})" title="Thêm đơn hàng">🛒</button>
-                            <button class="action-btn btn-care" onclick="CareModule.markCared(${c.id})" title="Đã CS (Không ghi chú)" style="${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? 'color:var(--color-success);font-weight:bold;' : 'display:inline-flex;align-items:center;justify-content:center;'}">${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? '✓' : '<div style="width:14px;height:14px;border:2px solid #fff;border-radius:3px;display:inline-block;"></div>'}</button>
-                            <button class="action-btn btn-transfer" onclick="CareModule.markTransferred(${c.id})" title="Đánh dấu chuyển">↗️</button>
+                            <button class="action-btn btn-recall" onclick="CareModule.markRecall(\'${c.id}\')" title="Chưa nghe máy / Cần gọi lại" style="color:${c.recall_status ? 'var(--color-warning)' : 'var(--text-muted)'}; font-weight:bold;">↻</button>
+                            <button class="action-btn btn-order" onclick="OrdersModule.showForm(null, \'${c.id}\')" title="Thêm đơn hàng">🛒</button>
+                            <button class="action-btn btn-care" onclick="CareModule.markCared(\'${c.id}\')" title="Đã CS (Không ghi chú)" style="${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? 'color:var(--color-success);font-weight:bold;' : 'display:inline-flex;align-items:center;justify-content:center;'}">${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? '✓' : '<div style="width:14px;height:14px;border:2px solid #fff;border-radius:3px;display:inline-block;"></div>'}</button>
+                            <button class="action-btn btn-transfer" onclick="CareModule.markTransferred(\'${c.id}\')" title="Đánh dấu chuyển">↗️</button>
                         </div>
                     </td>
                 </tr>
@@ -365,7 +365,7 @@ const CareModule = {
             const c = cMap[l.customer_id];
             return `<div style="padding:12px 0;border-bottom:1px solid var(--border-light);font-size:13px;text-align:left;">
                 <div style="margin-bottom:4px;">
-                    <strong>${c ? Utils.escapeHtml(c.full_name) : 'N/A'}</strong>
+                    <strong>${c ? Utils.escapeHtml(Utils.formatName(c.full_name)) : 'N/A'}</strong>
                     ${Utils.getGetFlyLink(c)} • ${l.care_type || 'Chăm sóc'}</span>
                 </div>
                 ${l.note ? `<div style="color:var(--text-main);line-height:1.5;">${Utils.escapeHtml(l.note).replace(/\\n/g, '<br>')}</div>` : ''}
@@ -743,7 +743,7 @@ const DrilldownModule = {
             return `<tr>
                 <td>${stt}</td>
                 <td>
-                    <strong style="cursor:pointer;" onclick="CustomersModule.viewCustomer(${c.id})">${Utils.escapeHtml(c.full_name)}</strong>
+                    <strong style="cursor:pointer;" onclick="CustomersModule.viewCustomer(\'${c.id}\')">${Utils.escapeHtml(Utils.formatName(c.full_name))}</strong>
                     ${c._isRecentCNM ? '<br><span style="background:#fff3cd; color:#856404; font-size:10px; padding:2px 4px; border-radius:4px; border:1px solid #ffeeba; display:inline-block; margin-top:2px;">📞 Hôm nay CNM</span>' : ''}
                     ${Utils.getGetFlyLink(c)}
                 </td>
@@ -755,8 +755,8 @@ const DrilldownModule = {
                 <td><span class="${expiryStatus.class}">${expiryStatus.label}</span></td>
                 <td><div class="action-btns">
                     <button class="action-btn btn-zalo" onclick="ZaloModule.openZalo('${c.zalo_phone || c.phone}')" title="Zalo">💬</button>
-                    <button class="action-btn btn-order" onclick="OrdersModule.showForm(null, ${c.id})" title="Thêm đơn hàng">🛒</button>
-                    <button class="action-btn btn-care" onclick="CareModule.markCared(${c.id})" title="Đã CS" style="${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? 'color:var(--color-success);font-weight:bold;' : 'display:inline-flex;align-items:center;justify-content:center;'}">${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? '✓' : '<div style="width:14px;height:14px;border:2px solid #fff;border-radius:3px;display:inline-block;"></div>'}</button>
+                    <button class="action-btn btn-order" onclick="OrdersModule.showForm(null, \'${c.id}\')" title="Thêm đơn hàng">🛒</button>
+                    <button class="action-btn btn-care" onclick="CareModule.markCared(\'${c.id}\')" title="Đã CS" style="${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? 'color:var(--color-success);font-weight:bold;' : 'display:inline-flex;align-items:center;justify-content:center;'}">${c.last_contact_date && c.last_contact_date.substring(0, 10) === Utils.today() ? '✓' : '<div style="width:14px;height:14px;border:2px solid #fff;border-radius:3px;display:inline-block;"></div>'}</button>
                 </div></td>
             </tr>`;
         }).join('');
@@ -795,7 +795,7 @@ const DrilldownModule = {
             <td>${o.quantity || 0}</td>
             <td style="font-weight:600;">${Utils.formatCurrency(o.total_amount)}</td>
             <td><span class="status-badge order-${o.order_status}">${Utils.orderStatusLabel(o.order_status)}</span></td>
-            <td><button class="action-btn btn-edit" onclick="OrdersModule.editOrder(${o.id})" title="Sửa">✏️</button></td>
+            <td><button class="action-btn btn-edit" onclick="OrdersModule.editOrder(\'${o.id}\')" title="Sửa">✏️</button></td>
         </tr>`).join('');
 
         Utils.renderPagination('drilldown-pagination', this.currentPage, totalPages, (page) => {
