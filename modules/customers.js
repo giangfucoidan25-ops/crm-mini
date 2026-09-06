@@ -165,6 +165,7 @@ const CustomersModule = {
                 const stt = start + index + 1;
                 const careTypeSuffix = careStatus.milestone ? ` <span style="color:${careStatus.milestone.color || '#28a745'}; font-weight:bold; margin-left:4px;" title="${careStatus.milestone.name}">${careStatus.milestone.label}</span>` : '';
                 const orderDateHtml = c.last_order_date ? `<span style="color:var(--text-muted); font-size: 11px; display:block; margin-bottom: 2px;">${Utils.formatDate(c.last_order_date)}</span>` : '';
+                const productNameHtml = c.last_product_used ? `<span style="color:var(--text-muted); font-size: 11px; display:block; margin-top: 2px;">${Utils.escapeHtml(c.last_product_used)}</span>` : '';
                 return `
                 <tr>
                     <td>${stt}</td>
@@ -176,6 +177,7 @@ const CustomersModule = {
                                 ${Utils.getGetFlyLink(c)}
                                 ${careTypeSuffix}
                                 ${c.tags ? `<span class="badge badge-purple" style="margin-left:4px;">${c.tags}</span>` : ''}
+                                ${productNameHtml}
                             </div>
                         </div>
                     </td>
