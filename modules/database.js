@@ -517,13 +517,39 @@ const DB = {
 
         if (validOrders.length > 0) {
             last_order_date = validOrders[0].order_date;
-            last_product_used = validOrders[0].product_name;
+            
+            // Resolve product name robustly
+            let resolvedProductName = validOrders[0].product_name;
+            if (!resolvedProductName) {
+                if (validOrders[0].items && validOrders[0].items.length > 0) {
+                    const mainItem = validOrders[0].items.find(i => !i.is_gift) || validOrders[0].items[0];
+                    resolvedProductName = mainItem.product_name;
+                }
+                if (!resolvedProductName && validOrders[0].product_id) {
+                    const p = await this.db.products.get(validOrders[0].product_id);
+                    if (p) resolvedProductName = p.product_name;
+                }
+            }
+            last_product_used = resolvedProductName;
+            
             estimated_product_end_date = validOrders[0].estimated_product_end_date || null;
 
             product_expiries = {};
             for (const o of validOrders) {
-                if (o.estimated_product_end_date && o.product_name) {
-                    let baseName = o.product_name.split('-')[0].trim();
+                let oName = o.product_name;
+                if (!oName) {
+                    if (o.items && o.items.length > 0) {
+                        const m = o.items.find(i => !i.is_gift) || o.items[0];
+                        oName = m.product_name;
+                    }
+                    if (!oName && o.product_id) {
+                        const p = await this.db.products.get(o.product_id);
+                        if (p) oName = p.product_name;
+                    }
+                }
+                
+                if (o.estimated_product_end_date && oName) {
+                    let baseName = oName.split('-')[0].trim();
                     if (!product_expiries[baseName]) {
                         product_expiries[baseName] = o.estimated_product_end_date;
                     }

@@ -627,15 +627,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                     
                     const allCustomers = await DB.db.customers.toArray();
                     for (const c of allCustomers) {
+                        let updated = false;
                         if (!c.getfly_url) {
                             const url = phoneToUrl[c.phone] || phoneToUrl[c.zalo_phone];
                             if (url) {
                                 await DB.updateCustomer(c.id, { getfly_url: url }); // Use updateCustomer to push
+                                updated = true;
                             }
+                        }
+                        if (!updated) {
+                            await DB.recalculateCustomerStats(c.id, true);
                         }
                     }
                     
-                    localStorage.setItem('supabase_fix_july_v4', 'done');
+                    localStorage.setItem('supabase_fix_july_v6', 'done');
                     console.log('Supabase fix applied and pushed to cloud!');
                 } catch (e) {
                     console.error('Error applying supabase fix:', e);
