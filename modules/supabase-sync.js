@@ -325,8 +325,13 @@ const SupabaseSync = {
             
 
             // Kích hoạt Realtime sau khi Pull xong
-
             this.subscribeToRealtime();
+            
+            // Refresh UI sau khi có dữ liệu mới từ Cloud
+            if (window.App && typeof App.handleRoute === 'function') {
+                console.log('🔄 Đang làm mới giao diện sau khi đồng bộ Cloud...');
+                App.handleRoute();
+            }
 
         } catch (e) {
 
