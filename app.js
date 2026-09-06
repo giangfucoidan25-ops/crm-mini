@@ -129,6 +129,40 @@ const App = {
                 console.log('Done recalculating stats.');
             }
 
+            // Tự động sửa dữ liệu tháng 7 và đẩy lên Supabase (chạy 1 lần)
+            const supabaseFix = localStorage.getItem('supabase_fix_july_v1');
+            if (!supabaseFix) {
+                console.log('Running Supabase data fix for July data...');
+                try {
+                    // Sửa trạng thái đơn hàng in hoa thành in thường
+                    const allOrders = await DB.db.orders.toArray();
+                    for (const o of allOrders) {
+                        if (o.order_status === 'COMPLETED' || o.order_status === 'DELIVERED' || o.order_status === 'SHIPPING') {
+                            const newStatus = o.order_status.toLowerCase();
+                            await DB.db.orders.update(o.id, { order_status: newStatus });
+                            await DB.recalculateCustomerStats(o.customer_id, true);
+                        }
+                    }
+
+                    // Sửa lỗi thiếu Getfly URL
+                    const phoneToUrl = {"0357847334": "https://fucoidan2026.getflycrm.com/#/crm/view_account/142238", "0949134168": "https://fucoidan2026.getflycrm.com/#/crm/view_account/247916", "0908710767": "https://fucoidan2026.getflycrm.com/#/crm/view_account/248220", "0338133542": "https://fucoidan2026.getflycrm.com/#/crm/view_account/248067", "0867279359": "https://fucoidan2026.getflycrm.com/#/crm/view_account/215302", "0967482779": "https://fucoidan2026.getflycrm.com/#/crm/view_account/248010", "0989329989": "https://fucoidan2026.getflycrm.com/#/crm/view_account/91909", "0346086477": "https://fucoidan2026.getflycrm.com/#/crm/view_account/218023", "0367759386": "https://fucoidan2026.getflycrm.com/#/crm/view_account/242992", "0916056444": "https://fucoidan2026.getflycrm.com/#/crm/view_account/243366", "0965089064": "https://fucoidan2026.getflycrm.com/#/crm/view_account/247700", "0974166788": "https://fucoidan2026.getflycrm.com/#/crm/view_account/194682", "0981564614": "https://fucoidan2026.getflycrm.com/#/crm/view_account/247465", "0907242660": "https://fucoidan2026.getflycrm.com/#/crm/view_account/52420", "0963707799": "https://fucoidan2026.getflycrm.com/#/crm/view_account/39200", "0393236459": "https://fucoidan2026.getflycrm.com/#/crm/view_account/60669", "0913570703": "https://fucoidan2026.getflycrm.com/#/crm/view_account/176294", "0776497393": "https://fucoidan2026.getflycrm.com/#/crm/view_account/247280", "0339174285": "https://fucoidan2026.getflycrm.com/#/crm/view_account/188023", "0395446181": "https://fucoidan2026.getflycrm.com/#/crm/view_account/245932", "0344042608": "https://fucoidan2026.getflycrm.com/#/crm/view_account/246802", "0327867662": "https://fucoidan2026.getflycrm.com/#/crm/view_account/246753", "0386939499": "https://fucoidan2026.getflycrm.com/#/crm/view_account/246696", "0983131167": "https://fucoidan2026.getflycrm.com/#/crm/view_account/246252", "0784411999": "https://fucoidan2026.getflycrm.com/#/crm/view_account/246626", "0353894362": "https://fucoidan2026.getflycrm.com/#/crm/view_account/191694", "0915767097": "https://fucoidan2026.getflycrm.com/#/crm/view_account/135071", "0865681363": "https://fucoidan2026.getflycrm.com/#/crm/view_account/246517", "0988723359": "https://fucoidan2026.getflycrm.com/#/crm/view_account/200723", "0946388755": "https://fucoidan2026.getflycrm.com/#/crm/view_account/240232", "0945851973": "https://fucoidan2026.getflycrm.com/#/crm/view_account/220288", "0908260380": "https://fucoidan2026.getflycrm.com/#/crm/view_account/242621", "0913203606": "https://fucoidan2026.getflycrm.com/#/crm/view_account/246295", "0394234292": "https://fucoidan2026.getflycrm.com/#/crm/view_account/246162", "0979974413": "https://fucoidan2026.getflycrm.com/#/crm/view_account/246042"};
+                    
+                    const allCustomers = await DB.db.customers.toArray();
+                    for (const c of allCustomers) {
+                        if (!c.getfly_url) {
+                            const url = phoneToUrl[c.phone] || phoneToUrl[c.zalo_phone];
+                            if (url) {
+                                await DB.db.customers.update(c.id, { getfly_url: url });
+                            }
+                        }
+                    }
+                    localStorage.setItem('supabase_fix_july_v1', 'done');
+                    console.log('Supabase fix applied!');
+                } catch (e) {
+                    console.error('Error applying supabase fix:', e);
+                }
+            }
+
             // ONE-TIME FIX FOR HUONG HOANG NOTE
             const hhNoteFixed = localStorage.getItem('hh_note_fixed_v1');
             if (!hhNoteFixed) {
