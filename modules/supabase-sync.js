@@ -433,36 +433,60 @@ const SupabaseSync = {
                         if (!k.includes('.')) allKeys.add(k);
                     }));
 
-                    // Sanitize
-                    const cleanDataList = data.map(obj => {
-                        const cleanData = {};
-                        allKeys.forEach(key => {
-                            let val = obj[key];
-                            const dateFields = ['care_date','created_at','updated_at','last_contact_date','next_care_date','last_order_date','last_completed_order_date','estimated_product_end_date','order_date','appointment_date'];
-                            
-                            if (val === undefined || val === '' || val === 'NaN') {
-                                cleanData[key] = null;
-                            } else if (dateFields.includes(key) && (val === null || val === '')) {
-                                cleanData[key] = null;
-                            } else {
-                                cleanData[key] = val;
-                            }
+                    // Sanitize function (có hỗ trợ drop các cột không hợp lệ)
+                    const sanitizeData = (keysToDrop = []) => {
+                        return data.map(obj => {
+                            const cleanData = {};
+                            allKeys.forEach(key => {
+                                if (keysToDrop.includes(key)) return; // Bỏ qua cột không có trên Cloud
+                                let val = obj[key];
+                                const dateFields = ['care_date','created_at','updated_at','last_contact_date','next_care_date','last_order_date','last_completed_order_date','estimated_product_end_date','order_date','appointment_date'];
+                                
+                                if (val === undefined || val === '' || val === 'NaN') {
+                                    cleanData[key] = null;
+                                } else if (dateFields.includes(key) && (val === null || val === '')) {
+                                    cleanData[key] = null;
+                                } else {
+                                    cleanData[key] = val;
+                                }
+                            });
+                            return cleanData;
                         });
-                        return cleanData;
-                    });
+                    };
                     
-                    // Batch push (Supabase upsert accepts arrays)
-                    const { error } = await this.client.from(table).upsert(cleanDataList);
-                    if (error) throw error;
+                    let cleanDataList = sanitizeData();
+                    let { error } = await this.client.from(table).upsert(cleanDataList);
+                    
+                    // FALLBACK: Nếu Supabase báo thiếu cột (PGRST204) do chưa chạy schema_update_v2.sql
+                    if (error && (error.code === 'PGRST204' || (error.message && error.message.includes('column')))) {
+                        console.warn(`[SupabaseSync] Lỗi schema ở bảng ${table}, thử bỏ các cột mới...`, error);
+                        const problemKeys = ['items', 'expiry_formula', 'deleted_at', 'product_expiries'];
+                        cleanDataList = sanitizeData(problemKeys);
+                        const retry = await this.client.from(table).upsert(cleanDataList);
+                        error = retry.error;
+                        if (!error) {
+                            console.log(`✅ Đã cứu vớt thành công bảng ${table} bằng cách bỏ các cột mới.`);
+                            alert(`[CẢNH BÁO SCHEMA]\nBảng ${table} trên Supabase của bạn đang thiếu các cột mới (như items, deleted_at...).\nHệ thống đã tự động loại bỏ chúng và đẩy dữ liệu cơ bản lên mây thành công!\n\nTuy nhiên, để dùng đầy đủ tính năng, bạn CẦN CHẠY file schema_update_v2.sql trên Supabase SQL Editor.`);
+                        }
+                    }
+
+                    if (error) {
+                        const errMsg = error.message || error.details || 'Lỗi không xác định';
+                        alert(`[DEBUG CHUYÊN GIA]\nLỗi Supabase khi đẩy toàn bộ bảng ${table}:\n${errMsg}\n\nDữ liệu đang cố gửi (bản ghi 1):\n${JSON.stringify(cleanDataList[0], null, 2)}\n\nHãy chụp ảnh màn hình này gửi cho AI!`);
+                        throw error;
+                    }
                     console.log(`Đã đẩy ${data.length} bản ghi lên bảng ${table}`);
                 }
             }
             
             Utils.showToast('✅ Đã khôi phục toàn bộ dữ liệu lên Cloud thành công!', 'success');
+            const topStatus = document.getElementById('topbar-sync-status');
             if (topStatus) topStatus.innerHTML = '<span style="color:var(--color-success);">☁️ Đã lưu mây</span>';
         } catch(e) {
             console.error('Lỗi đẩy dữ liệu:', e);
             Utils.showToast('Lỗi khi khôi phục dữ liệu lên Cloud!', 'error');
+            const topStatus = document.getElementById('topbar-sync-status');
+            if (topStatus) topStatus.innerHTML = '<span style="color:var(--color-danger);">☁️ Lỗi lưu mây</span>';
         }
     },
 
@@ -557,70 +581,50 @@ const SupabaseSync = {
     // ==========================================
 
     async push(tableName, dataObj) {
-
         if (!this.isConnected || this.isSyncing) return;
-
         
-
         try {
-
             const topStatus = document.getElementById('topbar-sync-status');
-
             if(topStatus) topStatus.innerHTML = '<span title="Đang đồng bộ lên đám mây..." style="color:var(--color-warning); animation: pulse 1s infinite alternate;">☁️ Đang lưu...</span>';
 
-
-
-            // SANITIZE: Xóa tất cả các key có chứa dấu chấm (do Dexie hoặc lỗi cũ để lại)
-
-            // PostgREST sẽ báo lỗi nếu có key chứa dấu chấm ở root level.
-
-            const cleanData = { ...dataObj };
-
-            const dateFields = ['care_date','created_at','updated_at','last_contact_date','next_care_date','last_order_date','last_completed_order_date','estimated_product_end_date','order_date','appointment_date'];
-
-            for (const key in cleanData) {
-
-                if (key.includes('.')) {
-
-                    delete cleanData[key];
-
-                } else if (dateFields.includes(key)) {
-
-                    if (cleanData[key] === '' || cleanData[key] === null || cleanData[key] === undefined || cleanData[key] === 'NaN') {
-
-                        cleanData[key] = null;
-
+            const sanitizeObj = (obj, keysToDrop = []) => {
+                const cleanData = { ...obj };
+                const dateFields = ['care_date','created_at','updated_at','last_contact_date','next_care_date','last_order_date','last_completed_order_date','estimated_product_end_date','order_date','appointment_date'];
+                
+                for (const key in cleanData) {
+                    if (key.includes('.') || keysToDrop.includes(key)) {
+                        delete cleanData[key];
+                    } else if (dateFields.includes(key)) {
+                        if (cleanData[key] === '' || cleanData[key] === null || cleanData[key] === undefined || cleanData[key] === 'NaN') {
+                            cleanData[key] = null;
+                        }
                     }
-
                 }
+                return cleanData;
+            };
 
-            }
-
-
-
-            const { error } = await this.client.from(tableName).upsert(cleanData);
-
+            let cleanData = sanitizeObj(dataObj);
+            let { error } = await this.client.from(tableName).upsert(cleanData);
             
-
+            // FALLBACK cho push đơn lẻ
+            if (error && (error.code === 'PGRST204' || (error.message && error.message.includes('column')))) {
+                console.warn(`[SupabaseSync] Lỗi schema ở bảng ${tableName} (đồng bộ đơn), thử bỏ cột mới...`, error);
+                const problemKeys = ['items', 'expiry_formula', 'deleted_at', 'product_expiries'];
+                cleanData = sanitizeObj(dataObj, problemKeys);
+                const retry = await this.client.from(tableName).upsert(cleanData);
+                error = retry.error;
+            }
+            
             if (error) throw error;
 
-
-
             if(topStatus) topStatus.innerHTML = '<span title="Đã đồng bộ an toàn" style="color:var(--color-success);">☁️ Đã lưu mây</span>';
-
         } catch (e) {
-
             console.error(`Lỗi đồng bộ lên ${tableName}:`, e);
-
             const errMsg = e.message || e.details || 'Lỗi không xác định';
-
             
-
             // DEBUG CHUYÊN GIA: Hiển thị popup chi tiết chính xác dữ liệu nào gây lỗi
-
             if (errMsg.includes('Could not find the') || errMsg.includes('column')) {
-
-                alert(`[DEBUG CHUYÊN GIA]\nLỗi Supabase khi lưu bảng ${tableName}:\n${errMsg}\n\nDữ liệu đang cố gửi:\n${JSON.stringify(cleanData, null, 2)}\n\nHãy chụp ảnh màn hình bảng này gửi cho AI!`);
+                alert(`[DEBUG CHUYÊN GIA]\nLỗi Supabase khi lưu bảng ${tableName}:\n${errMsg}\n\nDữ liệu đang cố gửi:\n${JSON.stringify(dataObj, null, 2)}\n\nHãy chụp ảnh màn hình bảng này gửi cho AI!`);
 
             } else {
 
